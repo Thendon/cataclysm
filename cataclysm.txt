@@ -1,0 +1,8 @@
+"Cataclysm"
+{
+	"base"		"base"
+	"title"		"Cataclysm"
+	"maps"		"^cata_"
+	"menusystem"	"1"
+	"workshopid"	"1441527170"
+}
