@@ -33,8 +33,6 @@ end
 physInits[ELEMENT_PHYS_TYPE.SOLID] = function( ent )
     ent:SetMoveType(MOVETYPE_VPHYSICS)
     ent:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
-    --ent:SetSolidFlags(FSOLID_FORCE_WORLD_ALIGNED)
-    --ent:SetMass(100000)
     ent:GetPhysicsObject():EnableMotion( false )
     ent:SetTrigger(false)
     ent:SetTriggerFlag(false)

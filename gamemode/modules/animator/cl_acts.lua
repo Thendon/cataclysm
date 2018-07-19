@@ -73,7 +73,7 @@ local VALID_ACT = {
     1788, --handshake
     1789, --handshake (no legs)
     1790, --gun2 knee
-    1791, --gun2 knee
+    1791, --gun2 knee FIREBALL
     1794, --gun3
     1795, --handshake2
     1796, --hug2

@@ -48,7 +48,7 @@ function PANEL:SetMaterial( mat )
 end
 
 function PANEL:GetMaterial()
-    self.icon:GetMaterial()
+    return self.icon:GetMaterial()
 end
 
 function PANEL:SetImage( image )
@@ -56,7 +56,7 @@ function PANEL:SetImage( image )
 end
 
 function PANEL:GetImage()
-    self.icon:GetImage()
+    return self.icon:GetImage()
 end
 
 function PANEL:SetText( text )

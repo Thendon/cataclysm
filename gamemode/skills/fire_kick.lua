@@ -1,18 +1,13 @@
 
-local skill = Skill( "fire_shot" )
+local skill = Skill( "fire_kick" )
 local distance = 280
 skill:SetMaxLive( 1 )
 skill:SetCooldown( 0.5 )
 skill:SetDamageType( "fire" )
 
-local sounds = {
-    "fire_shot",
-    "fire_hit3"
-}
-
-local col = Capsule(Vector(), Vector(50,0,0), 20)
-col:SetPos1Dest(Vector(100,0,0))
-col:SetPos2Dest(Vector(320,0,0))
+local col = Capsule(Vector(0,-20,0), Vector(0,20,0), 20)
+col:SetPos1Dest(Vector(320,-100,0))
+col:SetPos2Dest(Vector(320,100,0))
 
 function skill:Stage1( ent )
     local factor = ent.alive
@@ -33,9 +28,9 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
-        sound.Play(sounds[math.random(1, 2)], ent:GetPos())
-        CreateParticleSystem( ent, "element_fire_throw", PATTACH_POINT_FOLLOW, 1)
+        caster:PlayAnimation("kick_fire")
+        sound.Play("fire_shot2", ent:GetPos())
+        CreateParticleSystem( ent, "element_fire_spread", PATTACH_POINT_FOLLOW, 1)
 
         ent.collider = Capsule( col )
         ent.collider:SetEntity( ent )
@@ -62,6 +57,8 @@ if SERVER then
         ent.collider:Filter( { caster } )
 
         ent:SetNW2Vector("moveDir", forward * math.max(caster:GetVelocity():Dot(forward),0))
+
+        caster:SetVelocity( -caster:GetForward() * 200 )
     end
 
     function skill:StartTouch( ent, touched )

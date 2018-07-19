@@ -7,18 +7,35 @@ AccessorFunc( ENT, "destroy", "DestroyFlag", FORCE_BOOL )
 AccessorFunc( ENT, "trigger", "TriggerFlag", FORCE_BOOL )
 AccessorFunc( ENT, "casterCollision", "CasterCollision", FORCE_BOOL )
 AccessorFunc( ENT, "removeOnWorldTrace", "RemoveOnWorldTrace", FORCE_BOOL )
+AccessorFunc( ENT, "touchPlayerOnce", "TouchPlayerOnce", FORCE_BOOL )
+AccessorFunc( ENT, "touchCaster", "TouchCaster", FORCE_BOOL )
 
 function ENT:Initialize()
     self:DrawShadow( false )
     self:SetBirth( CurTime() )
     self.loaded = true
+
     self.touchCooldown = {}
-    self.casterCollision = false
-    self.RemoveOnWorldTrace = false
+    self.casterCollision = self.casterCollision or false
+    self.removeOnWorldTrace = self.removeOnWorldTrace or false
+    self.touchPlayerOnce = self.touchPlayerOnce or false
+    self.touchCaster = self.touchCaster or false
+    self.touchedPlayers = {}
 end
 
 function ENT:StartTouch( ent )
     if (!self:GetTriggerFlag()) then return end
+
+    if (ent:IsPlayer()) then
+        if (self:GetTouchCaster() and self:GetCaster() == ent) then
+            return
+        end
+
+        if (self:GetTouchPlayerOnce()) then
+            if (touchedPlayers[ent]) then return end
+            touchedPlayers[ent] = true
+        end
+    end
 
     local now = CurTime()
     self.touchCooldown[ent] = self.touchCooldown[ent] or 0

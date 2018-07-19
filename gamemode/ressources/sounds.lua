@@ -152,9 +152,9 @@ sound.Add({
 name = "explode"
 sound.Add({
 	name = prefix .. name,
-	channel = CHAN_ITEM,
+	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 130,
+	level = 150,
 	pitch = { 95, 110 },
 	sound = path .. name .. quality
 })
@@ -162,7 +162,7 @@ sound.Add({
 name = "explode2"
 sound.Add({
 	name = prefix .. name,
-	channel = CHAN_ITEM,
+	channel = CHAN_AUTO,
 	volume = 1.0,
 	level = 130,
 	pitch = { 95, 110 },
@@ -173,8 +173,8 @@ name = "burst"
 sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
-	volume = 1.0,
-	level = 130,
+	volume = 0.4,
+	level = 80,
 	pitch = { 95, 110 },
 	sound = path .. name .. quality
 })

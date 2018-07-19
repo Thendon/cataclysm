@@ -31,7 +31,7 @@ local hpLerpSpeed = 0.4
 local function CalcHealthFactor( ply )
     local maxHP = ply:GetMaxHealth()
     ply.lastHealthFactor = ply.lastHealthFactor or 1
-    local actualHP = ply:Health() / maxHP
+    local actualHP = math.Clamp(ply:Health() / maxHP, 0, 1)
 
     ply.lastHealthFactor = Lerp(hpLerpSpeed, ply.lastHealthFactor, actualHP)
     return ply.lastHealthFactor

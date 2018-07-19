@@ -78,6 +78,31 @@ anim = animation( seqs, 1 )
 
 animator:Add( "shoot_fire2", anim )
 
+seqs = {}
+anim = {}
+
+local id = 1649
+local val = 1
+table.insert(seqs, sequence( id, 0.15, 0, val ))
+table.insert(seqs, sequence( id, 0.5, val, val ))
+table.insert(seqs, sequence( id, 0.15, val, 0 ))
+
+anim = animation( seqs, 1 )
+
+animator:Add( "dash_fire", anim )
+
+seqs = {}
+anim = {}
+
+local id = 2004
+local val = 1
+table.insert(seqs, sequence( id, 0.15, 0, val ))
+table.insert(seqs, sequence( id, 0.15, val, 0 ))
+
+anim = animation( seqs, 1 )
+
+animator:Add( "kick_fire", anim )
+
 local function animatePlayerConstantly(ply)
     --for k, v in next, player.GetAll() do
         if (ply:AnimationRunning()) then return end
@@ -95,9 +120,9 @@ end)
 
 //###################################################
 
-local animLoop = VALID_ACTS[1]
-local animWeight = 0.5
-local animPlaying = true
+_G.animLoop = _G.animLoop or VALID_ACTS[1]
+local animWeight = 1
+local animPlaying = false
 local onlyValid = true
 
 local function animationLoopOn( ply )
@@ -188,7 +213,7 @@ local function animatorCam( ply, pos, angles, fov )
     local plyPos = ply:GetPos() + Vector(0,0,35)
     local lastAng = Angle()
 
-    view.origin = plyPos + lastAng:Forward() * - 60 --+ Vector(x,y,0) * 100
+    view.origin = plyPos + lastAng:Forward() * - 600 --+ Vector(x,y,0) * 100
 
     local plyDir = plyPos - view.origin
     plyDir:Normalize()

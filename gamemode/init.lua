@@ -52,4 +52,16 @@ function GM:EntityTakeDamage( ent, dmg )
     if (dmg:GetInflictor().isskill) then return true end
 end
 
+_G.ReachVelocity = function( ent, velocity )
+    velocity = velocity - ent:GetVelocity()
+
+    if ent:IsPlayer() then
+        ent:SetVelocity( velocity )
+        return
+    end
+
+    local physObj = ent:GetPhysicsObject()
+    physObj:AddVelocity(velocity)
+end
+
 netstream.Hook("GM:FinishedLoading", GM.FinishedLoading)

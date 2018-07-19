@@ -37,6 +37,9 @@ end
 
 local function UpdateSkill( panel )
     local key = panel:GetKey()
+    if (LocalPlayer().skills[key].icon != panel:GetMaterial()) then
+        panel:SetMaterial( LocalPlayer().skills[key].icon )
+    end
     panel:SetCooldown( LocalPlayer():GetCooldown( key ) )
 end
 

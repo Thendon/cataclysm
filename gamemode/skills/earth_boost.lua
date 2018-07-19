@@ -3,7 +3,6 @@ local end_up = 0.25
 earth_boost:SetStages( { end_up } )
 earth_boost:SetMaxLive( 1 )
 earth_boost:SetCooldown( 1 )
-earth_boost:SetDamageType( "earth" )
 
 local models = {
     "models/props_wasteland/rockcliff01e.mdl",
