@@ -75,18 +75,24 @@ require("classes")
 require("pon")
 require("netstream")
 require("ecall")
-print("# Setup FastDL")
-AddCSFolder( GM.Name .. "/gamemode" )
-AddCSFolder( GM.Name .. "/entities" )
+if SERVER then
+    print("# Setup FastDL")
+    AddCSFolder( GM.Name .. "/gamemode" )
+    AddCSFolder( GM.Name .. "/entities" )
+    AddResources( "resource/fonts")
+end
 print("# Loading Code")
-LoadFolder( GM.Name .. "/gamemode/ressources" )
+LoadFolder( GM.Name .. "/gamemode/resources" )
 LoadFolder( GM.Name .. "/gamemode/managers" )
 LoadFolder( GM.Name .. "/gamemode/extensions" )
 LoadFolder( GM.Name .. "/gamemode/modules" )
 LoadFolder( GM.Name .. "/gamemode/skills" )
+
+include("player_class/element/base.lua")
 LoadFolder( GM.Name .. "/gamemode/player_class" )
 if CLIENT then
     require("tdlib")
     LoadFolder( GM.Name .. "/gamemode/vgui" )
+    LoadFolder( GM.Name .. "/gamemode/animations" )
 end
 print("\n\n")

@@ -2,6 +2,8 @@ local bounds = bounds or {}
 
 function bounds.pointInCylinderCalc( axis, difference, radiusSqr)
     local length = axis:LengthSqr()
+    if length == 0 then return false end
+
     local dot = difference:Dot(axis)
 
     if ( dot < 0 || dot > length ) then
@@ -41,22 +43,47 @@ function bounds.pointInCapsule( p1, p2, radiusSqr, pTest )
     local difference, distance
 
     difference = pTest - p2
-    distance = bounds.pointInSphereCalc(difference, radiusSqr)
-    if (distance) then return distance end
+    distance = bounds.pointInSphereCalc(difference, radiusSqr) or false
+
+    if p1 == p2 then return distance end
+
+    local lowestDistance = distance
+    --local lowestDifference = difference
 
     difference = pTest - p1
     distance = bounds.pointInSphereCalc(difference, radiusSqr)
-    if (distance) then return distance end
+    if distance then
+        if !lowestDistance then
+            lowestDistance = distance
+        elseif distance < lowestDistance then
+            --lowestDifference = difference
+            lowestDistance = distance
+        end
+    end
 
     local axis = p2 - p1
     distance = bounds.pointInCylinderCalc(axis, difference, radiusSqr)
-    if (distance) then return distance end
+    if !lowestDistance then lowestDistance = distance end
+    if distance then
+        if !lowestDistance then
+            lowestDistance = distance
+        elseif distance < lowestDistance then
+            lowestDistance = distance
+        end
+    end
+
+    if lowestDistance then return distance end
 
     return false
 end
 
 local function callbackOnAttachmentsOf( ent, callback )
-    for _, attachment in next, ent:GetAttachments() do
+    local attachments = ent:GetAttachments()
+    if (!attachments or table.Empty(attachments)) then
+        return callback( ent:GetPos() )
+    end
+
+    for _, attachment in next, attachments do
         local ret = callback( ent:GetAttachment(attachment.id).Pos )
         if ret then return ret end
     end
@@ -81,13 +108,35 @@ function bounds.entInCapsule( ent, p1, p2, radiusSqr )
     end)
 end
 
-function bounds.playersInCapsule( p1, p2, radiusSqr, blacklist )
+local function somethingInSomething( list, blacklist, radiusSqr, func, ... )
     blacklist = blacklist or {}
     local inside = {}
-    for _, ply in next, player.GetAll() do
-        if blacklist[ply] then continue end
-        local distance = bounds.entInCapsule( ply, p1, p2, radiusSqr )
-        if distance then table.insert( inside, { ply = ply, distance = distance } ) end
+    for _, obj in next, list do
+        if blacklist[obj] then continue end
+        local distance = bounds[func]( obj, ..., radiusSqr )
+        if distance then table.insert( inside, { obj = obj, distance = distance } ) end
+    end
+    return inside
+end
+
+function bounds.objectsInCapsule( list, p1, p2, radiusSqr, blacklist )
+    blacklist = blacklist or {}
+    local inside = {}
+    for _, obj in next, list do
+        if blacklist[obj] then continue end
+        local distance = bounds.entInCapsule( obj, p1, p2, radiusSqr )
+        if distance then table.insert( inside, { obj = obj, distance = distance } ) end
+    end
+    return inside
+end
+
+function bounds.objectsInSphere( list, pos, radiusSqr, blacklist )
+    blacklist = blacklist or {}
+    local inside = {}
+    for _, obj in next, list do
+        if blacklist[obj] then continue end
+        local distance = bounds.entInSphere( obj, pos, radiusSqr )
+        if distance then table.insert( inside, { obj = obj, distance = distance } ) end
     end
     return inside
 end

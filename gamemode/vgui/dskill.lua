@@ -6,6 +6,9 @@ function PANEL:Init()
     self.icon = TDLib("DImage", self)
     self.icon:SetPos( 0,0 )
 
+    self.keyImage = TDLib("DImage", self)
+    self.keyImage:SetPos( 0,0 )
+
     --[[self.loading = TDLib("DImage", self)
     self.loading:SetPos( 0,0 )
     --self.loading:SetBackgroundColor(_COLOR.FADE)
@@ -16,10 +19,12 @@ function PANEL:Init()
     self.label:SetPos( 0,0 )
     self.label:SetFont("fujimaru")
     self.label:SetTextColor(_COLOR.BLACK)
+    self.label:SetText("")
 end
 
 function PANEL:PerformLayout(w, h)
     self.icon:SetSize(w, h)
+    self.keyImage:SetSize(w,h)
     self.label:SetSize(w * 2, h)
     --self.loading:SetSize(w, h)
     local letters = string.len(self:GetText())
@@ -49,6 +54,14 @@ end
 
 function PANEL:GetMaterial()
     return self.icon:GetMaterial()
+end
+
+function PANEL:SetMaterial2( mat )
+    self.keyImage:SetMaterial( mat )
+end
+
+function PANEL:GetMaterial2()
+    return self.keyImage:GetMaterial()
 end
 
 function PANEL:SetImage( image )

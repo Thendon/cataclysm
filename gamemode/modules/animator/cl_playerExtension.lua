@@ -1,13 +1,11 @@
 local player = FindMetaTable( "Player" )
 
-local AnimationManager = include("cl_animationManager.lua")
-
 function player:PlayAnimation( anim )
     if (self.anim and !self.anim.interruptible) then return end
     self.animState = 0
 
     if (isstring(anim)) then
-        anim = AnimationManager:GetAnimation( anim )
+        anim = AnimationManager.GetAnimation( anim )
     end
 
     if (!anim) then error("animation " .. tostring(anim) .. " invalid!") end

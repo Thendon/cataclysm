@@ -5,5 +5,5 @@ function player:SetClassPick( class )
 end
 
 function player:GetClassPick()
-    return self.classPick or "fire"
+    return self.classPick or "air"
 end

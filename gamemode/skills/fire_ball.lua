@@ -7,11 +7,15 @@ skill:SetCooldown( 1 )
 skill:SetDamageType( "fire" )
 
 local moveSpeed = 5000
+local blastRange = 1000
+local blastDamage = 50
+local blastPower = 10
 
-local explosions = {
-    "element_fire_explode",
-    "element_fire_explode2",
-    "element_fire_implode"
+blastRange = blastRange * blastRange
+
+local sounds = {
+    "fire_hit",
+    "fire_hit2"
 }
 
 function skill:Stage1( ent )
@@ -22,21 +26,25 @@ function skill:Stage1( ent )
 end
 
 function skill:Transition1( ent )
-    if CLIENT then return end
+    if CLIENT then
+        ent:EmitSound( "fire_burning" )
+        return
+    end
     ent:InitPhys(ELEMENT_PHYS_TYPE.PROJECTILE)
     ent:PhysWake()
-    ent:EmitSound( "earth_woosh2" )
     ent.velocity = ent:GetCaster():GetAimVector() * moveSpeed
 end
 
 function skill:Stage2( ent )
     if CLIENT then return end
 
-    ReachVelocity( ent, ent.velocity )
+    --ent:ReachVelocity( ent.velocity )
+    local physObj = ent:GetPhysicsObject()
+    physObj:SetVelocity(ent.velocity)
 end
 
 function skill:CanBeActivated( caster )
-    return caster:OnGround()
+    return caster:WaterLevel() < 2
 end
 
 if CLIENT then
@@ -44,7 +52,7 @@ if CLIENT then
         --sound.Play("fire_explode", ent:GetPos())
 
         caster:PlayAnimation("shoot_fire1")
-        sound.Play("fire_explode2", caster:GetPos())
+        sound.Play(sounds[math.random(1, 2)], caster:GetPos())
         ent:CreateParticleEffect("element_fire_ball", 1)
     end
 end
@@ -52,20 +60,35 @@ end
 if SERVER then
     function skill:Spawn( ent, caster )
         ent:SetModel( "models/props/cs_militia/militiarock05.mdl" )
-        --ent:SetInvisible(true)
+        ent:SetInvisible(true)
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
-        function ent:OnRemove()
-            ParticleEffect("element_fire_explode"--[[explosions[math.random(1, 3)]], self:GetPos(), Angle())
-            self:StopSound("earth_woosh2")
-            sound.Play("fire_explode", self:GetPos())
-
-            //NETWORK ME :)
-        end
         ent:SetCustomCollisionCheck( true )
     end
 
     function skill:PhysicsCollide( ent, data, phys )
+        print("SET DESTROY FLAG") --check in gm_dunes
         ent:SetDestroyFlag(true)
+    end
+end
+
+function skill:OnRemove( ent )
+    if CLIENT then
+        ParticleEffect("element_fire_explode"--[[explosions[math.random(1, 3)]], ent:GetPos(), Angle())
+        ent:StopSound("fire_burning")
+        sound.Play("fire_explode", ent:GetPos())
+        return
+    end
+
+    local pos = ent:GetPos()
+
+    local hits = bounds.playersInSphere( pos, blastRange )
+    for _, hit in next, hits do
+        local damage = ( 1 - hit.distance / blastRange ) * blastDamage
+        print(hit.ply, damage)
+        local velocity = hit.ply:GetPos() - pos
+        velocity.z = velocity.z + 100
+        hit.ply:SetVelocity(velocity:GetNormalized() * blastPower * damage)
+        self:Hit(ent, ent:GetCaster(), hit.ply, damage, DMG_FALL, velocity)
     end
 end
 

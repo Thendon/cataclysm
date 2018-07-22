@@ -1,5 +1,5 @@
 
-local sequence = Class()
+_G.Sequence = Sequence or Class()
 
 local function validateAct( actID )
     if (!table.HasValue(VALID_ACTS, actID)) then
@@ -8,7 +8,7 @@ local function validateAct( actID )
     return actID
 end
 
-function sequence:_init( actID, duration, startW, endW )
+function Sequence:_init( actID, duration, startW, endW )
     self.actID = actID --validateAct(actID)
     self.duration = duration or 1
     self.durationFactor = 1 / self.duration
@@ -16,9 +16,7 @@ function sequence:_init( actID, duration, startW, endW )
     self.endW = endW or 1
 end
 
-function sequence:GetInfos( state )
+function Sequence:GetInfos( state )
     local weight = self.startW + state * (self.endW - self.startW)
     return self.actID, weight
 end
-
-return sequence

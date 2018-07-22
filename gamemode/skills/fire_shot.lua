@@ -5,6 +5,9 @@ skill:SetMaxLive( 1 )
 skill:SetCooldown( 0.5 )
 skill:SetDamageType( "fire" )
 
+local damage = 20
+local rate = 0.2
+
 local sounds = {
     "fire_shot",
     "fire_hit3"
@@ -15,16 +18,10 @@ col:SetPos1Dest(Vector(100,0,0))
 col:SetPos2Dest(Vector(320,0,0))
 
 function skill:Stage1( ent )
-    local factor = ent.alive
     ent:SetPos( ent:GetPos() + ent:GetNW2Vector("moveDir") * ent.deltaTime )
 
-    ent.collider:LerpPositions(factor)
     if CLIENT then return end
-    local hits = ent.collider:PlayersTouched()
-
-    for _, hit in next, hits do
-        self:StartTouch( ent, hit.ply )
-    end
+    ent:GetCustomCollider():SetFraction(ent.alive)
 end
 
 function skill:CanBeActivated( caster )
@@ -36,13 +33,6 @@ if CLIENT then
         caster:PlayAnimation("shoot_fire" .. math.random(1,2))
         sound.Play(sounds[math.random(1, 2)], ent:GetPos())
         CreateParticleSystem( ent, "element_fire_throw", PATTACH_POINT_FOLLOW, 1)
-
-        ent.collider = Capsule( col )
-        ent.collider:SetEntity( ent )
-    end
-
-    function skill:Draw( ent )
-        ent.collider:Draw()
     end
 end
 
@@ -55,20 +45,19 @@ if SERVER then
         ent:SetPos( pos )
         ent:SetAngles( ang )
         ent:SetInvisible( true )
-        ent:SetTouchPlayerOnce( true )
+        --ent:SetTouchPlayerOnce( true )
         ent:SetRemoveOnWorldTrace( true )
-        ent.collider = Capsule( col )
-        ent.collider:SetEntity( ent )
-        ent.collider:Filter( { caster } )
+        ent:SetTriggerFlag( true )
+        ent:SetTouchRate( rate )
+        ent:SetCustomCollider( Capsule( col ) )
 
-        ent:SetNW2Vector("moveDir", forward * math.max(caster:GetVelocity():Dot(forward),0))
+        ent:SetNW2Vector("moveDir", forward * math.max(caster:GetVelocity():Dot(forward),0) * 1.5)
     end
 
-    function skill:StartTouch( ent, touched )
-        local damage = distance - (ent.alive * distance)
-        damage = damage * 0.1
+    function skill:Touch( ent, touched )
+        local factor = (distance - ent.alive * distance) / distance
 
-        self:Hit(ent, caster, touched, damage, DMG_BLAST, ent:GetForward())
+        self:Hit(ent, ent:GetCaster(), touched, damage * factor, DMG_FALL, ent:GetForward())
     end
 end
 

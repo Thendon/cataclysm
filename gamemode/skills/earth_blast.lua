@@ -18,12 +18,14 @@ function earth_blast:Stage1( ent )
 end
 
 function earth_blast:Transition1( ent )
-    sound.Play("earth_hit", ent:GetPos())
+    if CLIENT then
+        sound.Play("earth_hit", ent:GetPos())
+        ent:EmitSound( "earth_woosh" )
+        return
+    end
 
-    if CLIENT then return end
     ent:InitPhys(ELEMENT_PHYS_TYPE.PROJECTILE)
     ent:PhysWake()
-    ent:EmitSound( "earth_woosh" )
 
     local phys = ent:GetPhysicsObject()
     phys:AddVelocity(ent:GetCaster():GetAimVector() * 10000)
@@ -31,6 +33,14 @@ end
 
 function earth_blast:CanBeActivated( caster )
     return caster:OnGround()
+end
+
+function earth_blast:OnRemove( ent )
+    if SERVER then return end
+
+    ParticleEffect("element_earth_explode", ent:GetPos(), Angle())
+    ent:StopSound("earth_woosh")
+    sound.Play("earth_hit3", ent:GetPos())
 end
 
 if CLIENT then
@@ -50,11 +60,6 @@ if SERVER then
         ent:SetAngles(Angle(math.random(0, 360),math.random(0, 360),0))
         ent:SetNW2Vector( "physPos", offset + _VECTOR.UP * 60 )
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
-        function ent:OnRemove()
-            ParticleEffect("element_earth_explode", self:GetPos(), Angle())
-            self:StopSound("earth_woosh")
-            sound.Play("earth_hit3", self:GetPos())
-        end
         ent:SetCustomCollisionCheck( true )
         --ent:NoCollideWithCaster()
     end
@@ -82,7 +87,7 @@ if SERVER then
         dmg:SetDamageType(DMG_CRUSH)
         dmg:SetAttacker(ent)
         dmg:SetInflictor(ent:GetCaster())
-        dmg:SetDamageForce(-velocity)
+        dmg:SetDamageForce(velocity) //TODO MIT MARTEN TESTEN OB RAGDOLL BALLERT :)
         dmg:SetDamage(damage)
 
         touched:TakeDamageInfo(dmg)
