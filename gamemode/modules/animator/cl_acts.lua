@@ -1,4 +1,4 @@
-local VALID_ACT = {
+local VALID_ACTS = {
     991, --duck
     996, --idle
     999, --duck2
@@ -102,33 +102,4 @@ local VALID_ACT = {
     2019, --psy
 }
 
-return VALID_ACT
---[[
-Anims found:
-1802, --head wiggle
-18
-18
-18
-18
-1897
-
-1959 --wiggle
-19
-19
-1999 --stomp2
-]]
-
---[[USELESS ANIMS
-996 --idle
-1621 --idle
-1622 --idle
-1623 --idle
-1624 --idle
-1777 --idle2
-1778 --idle2
-1779 --idle2
-]]
-
---[[GOOD ANIMS
-ACT_HL2MP_SWIM
-]]
+_G.VALID_ACTS = VALID_ACTS

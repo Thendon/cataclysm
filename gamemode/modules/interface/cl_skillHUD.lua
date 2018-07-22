@@ -7,6 +7,13 @@ keyStrings[KEY_R] = "R"
 keyStrings[MOUSE_LEFT] = "Left"
 keyStrings[MOUSE_RIGHT] = "Right"
 
+local keyMaterials = {}
+keyMaterials[KEY_Q] = Material("element/skills/Q.png")
+keyMaterials[KEY_E] = Material("element/skills/E.png")
+keyMaterials[KEY_R] = Material("element/skills/R.png")
+keyMaterials[MOUSE_LEFT] = Material("element/skills/Left.png")
+keyMaterials[MOUSE_RIGHT] = Material("element/skills/Right.png")
+
 local skillw, skillh = 128, 128
 
 function UI.Init()
@@ -47,7 +54,8 @@ function UI.CreateSkill(key, x, y)
     local skill = TDLib("DSkill", UI.skillBar)
     skill:SetKey( key )
     skill:SetMaterial( LocalPlayer().skills[key].icon )
-    skill:SetText( keyStrings[key] )
+    --skill:SetText( keyStrings[key] )
+    skill:SetMaterial2( keyMaterials[key] )
     skill:SetPos( x, y )
     skill:SetSize( skillw, skillh )
     skill.Think = UpdateSkill

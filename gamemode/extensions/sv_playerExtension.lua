@@ -2,7 +2,7 @@ local player = FindMetaTable( "Player" )
 
 local speedEpsilon = 500
 local speedDamageFactor = 0.05
-local waitAfterPhysHit = 0.02
+local waitAfterPhysHit = 0.05
 
 local fallsounds = {
     Sound("player/damage1.wav"),
@@ -23,7 +23,8 @@ local STATUS = {}
 STATUS.SILENCED = 1
 STATUS.CASTING = 2
 STATUS.FALLIMMUNE = 3
-STATUS.SLOWED = 4
+STATUS.FALLDAMPED = 4
+STATUS.SLOWED = 5
 
 speedEpsilon = speedEpsilon * speedEpsilon
 
@@ -36,42 +37,62 @@ function player:Loaded()
 end
 
 function player:Move(mv)
-    self.startVelocity = mv:GetVelocity()
-
     player_manager.RunClass(self, "CalcMoveSpeed")
 end
 
 function player:FinishMove(mv)
-    local stopVelocity = mv:GetVelocity()
-    local direction = stopVelocity - self.startVelocity
+    self.lastVelocity = self.lastVelocity or Vector()
+    self.lastOnGround = self.lastOnGround or true
 
-    local difference = direction:LengthSqr()
+    local velocity = mv:GetVelocity()
+    local veloLength = velocity:LengthSqr()
+    local lastLength = self.lastVelocity:LengthSqr()
+
+    local direction = velocity - self.lastVelocity
+    self.lastVelocity = velocity
+
+    --[[local lastOnGround = self.lastOnGround
+    self.lastOnGround = self:OnGround()
+
+    if self.lastOnGround and lastOnGround then return end]]
+    if veloLength >= lastLength then return end
+
+    local difference = lastLength - veloLength
     if (difference < speedEpsilon) then return end
+    print(direction, difference)
+
+    local damper = self:GetFallDamper()
+    if damper then
+        difference = difference * damper
+        if (difference < speedEpsilon) then return end
+    end
 
     local speed = math.sqrt(difference - speedEpsilon)
-
     self:HitWorld( speed, direction )
 end
 
 function player:HitWorld( speed, direction )
-    if self:IsFallImmune() then
-        self:SetFallImmune( false )
-        return
-    end
+    if !self:Alive() then return end
+
+    if self:IsFallImmune() then return end
+
     if ((CurTime() - self:LastPhysHit()) < waitAfterPhysHit) then return end
+    self:UpdateLastPhysHit()
 
     local damage = speed * speedDamageFactor
 
     local dmg = DamageInfo()
-    dmg:SetDamageType(DMG_FALL)
+    dmg:SetDamageType(DMG_GENERIC)
     dmg:SetAttacker(game.GetWorld())
     dmg:SetInflictor(game.GetWorld())
-    dmg:SetDamageForce(-direction:GetNormalized())
     dmg:SetDamage(damage)
 
     self:TakeDamageInfo(dmg)
 
-    if damage > 5 then
+    local now = CurTime()
+    self.nextFallSound = self.nextFallSound or now
+    if damage > 5 and self.nextFallSound < now then
+        self.nextFallSound = now + 1
         sound.Play(table.Random(fallsounds), self:GetPos(), 80, 100, 1)
     end
 end
@@ -123,6 +144,23 @@ function player:SetFallImmune( time )
     self:SetStatusTime( STATUS.FALLIMMUNE, time )
 end
 
+function player:IsFallDamped()
+    return self:HasStatus( STATUS.FALLDAMPED )
+end
+
+function player:SetFallDamper( time, factor, factorFactor )
+    self:SetStatusTime( STATUS.FALLDAMPED, time )
+    self.fallFactor = factor
+    self.fallFactorFactor = factorFactor or 1
+end
+
+function player:GetFallDamper()
+    if (!self:IsFallDamped()) then return false end
+    local fallFactor = self.fallFactor
+    self.fallFactor = self.fallFactor * self.fallFactorFactor
+    return math.Clamp(fallFactor,0,1)
+end
+
 function player:IsSlowed()
     return self:HasStatus( STATUS.SLOWED )
 end
@@ -146,7 +184,7 @@ function player:UpdateLastPhysHit()
     self.lastPhysHit = CurTime()
 end
 
-function player:PhysHit( velocity )
+--[[function player:PhysHit( velocity )
     self:UpdateLastPhysHit()
     self:SetVelocity( velocity )
-end
+end]]

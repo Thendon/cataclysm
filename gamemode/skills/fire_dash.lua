@@ -12,10 +12,9 @@ function skill:Stage1( ent )
 
     if CLIENT then return end
 
-    velocity = forward * -power
+    local velocity = forward * -power
     velocity.z = 0
-
-    ReachVelocity(caster, velocity)
+    caster:ReachVelocity(velocity)
 end
 
 function skill:CanBeActivated( caster )
@@ -25,7 +24,7 @@ end
 if CLIENT then
     function skill:Activate( ent, caster )
         caster:PlayAnimation("dash_fire")
-        caster:EmitSound("fire_burst")
+        ent:EmitSound("fire_burst")
         ent:CreateParticleEffect("element_fire_dash", 1)
     end
 end
@@ -41,7 +40,8 @@ if SERVER then
             self:StopSound("fire_burst")
         end
 
-        caster:SetFallImmune( 4 )
+        caster:SetFallDamper( 1.5, 0.25 )
+        --caster:SetFallImmune( 1.5 )
     end
 end
 

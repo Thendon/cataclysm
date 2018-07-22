@@ -46,6 +46,7 @@ if SERVER then
         cleverData.ang:RotateAroundAxis(cleverData.dir, math.random(1, 360))
         ent:SetAngles( cleverData.ang )
         ent:SetNW2Vector( "endPos", cleverData.pos + cleverData.dir * 50 )
+
         function ent:OnRemove()
             ParticleEffect("element_earth_explode", self:GetPos(), Angle())
         end

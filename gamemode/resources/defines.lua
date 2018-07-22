@@ -1,7 +1,7 @@
 
 _G._VECTOR = {
 	UP = Vector(0, 0, 1),
-	LEFT = Vector(0, 1, 0),
+	RIGHT = Vector(0, 1, 0),
 	FOR = Vector(1, 0, 0)
 }
 

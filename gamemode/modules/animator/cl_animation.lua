@@ -1,12 +1,12 @@
-local animation = Class()
+_G.Animation = Animation or Class()
 
-function animation:_init( sequences, speed, interruptable )
+function Animation:_init( sequences, speed, interruptable )
     self.sequences = sequences
     self.speed = speed or 1
     self.interruptible = (interruptible == nil) and true or false
 end
 
-function animation:GetActiveSequence( state )
+function Animation:GetActiveSequence( state )
     local activeSequence = -1
     local sequenceState = 0
     local prevDuration = 0
@@ -24,10 +24,8 @@ function animation:GetActiveSequence( state )
     return activeSequence, sequenceState
 end
 
-function animation:GetInfos( state )
+function Animation:GetInfos( state )
     local activeSequence, sequenceState = self:GetActiveSequence( state )
     if (activeSequence == -1) then return activeSequence end
     return activeSequence:GetInfos( sequenceState )
 end
-
-return animation

@@ -53,9 +53,11 @@ function ENT:Think()
     self.lastThink = now
 
     if (SERVER) then
+        if ( self:GetRemoveOnDeath() and !self:GetCaster():Alive() ) then self:Remove() end
         if ( self.alive > self:GetMaxLive() ) then self:Remove() end
         if ( self:GetDestroyFlag() ) then self:Remove() end
         if ( self:GetRemoveOnWorldTrace() ) then self:CheckWorldTrace() end
+        if ( self:GetCustomCollider() ) then self:CalcCustomCollisions() end
     end
 
     local stage = self:GetNW2Int("stage")
@@ -67,4 +69,35 @@ function ENT:Think()
 
     self:NextThink( now )
     return true
+end
+
+function ENT:SetCustomCollider( collider )
+    self.collider = collider
+    self.collider:SetEntity( self )
+    if SERVER and !self:GetTouchCaster() then
+        self.collider:Filter( { self:GetCaster() } )
+    end
+    return self.collider
+end
+
+function ENT:GetCustomCollider()
+    return self.collider
+end
+
+function ENT:CalcCustomCollisions()
+    local hits = {}
+    if self:GetTouchAllEnts() then
+        hits = self.collider:EntitiesTouched()
+    else
+        hits = self.collider:PlayersTouched()
+    end
+
+    for _, hit in next, hits do
+        self:Touch( hit.obj )
+    end
+end
+
+function ENT:OnRemove()
+    local skill = self:GetSkill()
+    ecall(skill.OnRemove, skill, self)
 end

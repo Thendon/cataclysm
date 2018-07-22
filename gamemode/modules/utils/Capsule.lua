@@ -7,9 +7,11 @@ AccessorFunc( Capsule, "pos1Dest", "Pos1Dest" )
 AccessorFunc( Capsule, "pos2Dest", "Pos2Dest" )
 AccessorFunc( Capsule, "Entity", "Entity" )
 
-local drawDetail = 10
+local drawDetail = 20
 
 function Capsule:_init(pos1, pos2, radius, ent)
+    self.filtered = {}
+
     if pos1.iscapsule then
         self:_initFromObj( pos1 )
         return
@@ -24,7 +26,6 @@ function Capsule:_init(pos1, pos2, radius, ent)
     self.pos1Dest = pos1
     self.pos2Dest = pos2
     self.Entity = ent
-    self.filtered = {}
 end
 
 function Capsule:_initFromObj( capsule )
@@ -37,24 +38,25 @@ function Capsule:_initFromObj( capsule )
     self.pos1Dest = capsule.pos1Dest
     self.pos2Dest = capsule.pos2Dest
     self.Entity = capsule.Entity
-    self.filtered = capsule.filtered
 end
 
-function Capsule:LerpPositions( factor )
-    self.pos1Lerped = LerpVector( factor, self.pos1, self.pos1Dest )
-    self.pos2Lerped = LerpVector( factor, self.pos2, self.pos2Dest )
+function Capsule:SetFraction( fraction )
+    fraction = math.Clamp(fraction, 0, 1)
+    self.pos1Lerped = LerpVector( fraction, self.pos1, self.pos1Dest )
+    self.pos2Lerped = LerpVector( fraction, self.pos2, self.pos2Dest )
     return self.pos1Lerped, self.pos2Lerped
-end
-
-function Capsule:PosToWorld( pos )
-    if !self.Entity then return pos end
-    return self.Entity:LocalToWorld( pos )
 end
 
 function Capsule:PlayersTouched()
     local pos1 = self:PosToWorld(self.pos1Lerped)
     local pos2 = self:PosToWorld(self.pos2Lerped)
-    return bounds.playersInCapsule(pos1, pos2, self.radiusSqr, self.filtered)
+    return bounds.objectsInCapsule(player.GetAll(), pos1, pos2, self.radiusSqr, self.filtered)
+end
+
+function Capsule:EntitiesTouched()
+    local pos1 = self:PosToWorld(self.pos1Lerped)
+    local pos2 = self:PosToWorld(self.pos2Lerped)
+    return bounds.objectsInCapsule(ents.GetAll(), pos1, pos2, self.radiusSqr, self.filtered)
 end
 
 function Capsule:Draw()
@@ -63,12 +65,12 @@ function Capsule:Draw()
 
     local step = 2 * math.pi / drawDetail
 
-    local left = -_VECTOR.LEFT * self.radius
+    local right = -_VECTOR.RIGHT * self.radius
     local up = _VECTOR.UP * self.radius
     for i = 1, drawDetail do
-        local offsetLeft = left * math.cos(i * step)
+        local offsetRight = right * math.cos(i * step)
         local offsetUp = up * math.sin(i * step)
-        local offset = offsetLeft + offsetUp
+        local offset = offsetRight + offsetUp
         local offset1 = self:PosToWorld(self.pos1Lerped + offset)
         local offset2 = self:PosToWorld(self.pos2Lerped + offset)
 
@@ -96,4 +98,24 @@ function Capsule:Filter( players )
     for _, ply in next, players do
         self.filtered[ply] = true
     end
+end
+
+function Capsule:PosToWorld( pos )
+    if !self.Entity then return pos end
+    return self.Entity:LocalToWorld( pos )
+end
+
+function Capsule:GetForward()
+    if !self.Entity then return _VECTOR.FOR end
+    return self.Entity:GetForward()
+end
+
+function Capsule:GetRight()
+    if !self.Entity then return _VECTOR.RIGHT end
+    return self.Entity:GetRight()
+end
+
+function Capsule:GetUp()
+    if !self.Entity then return _VECTOR.UP end
+    return self.Entity:GetUp()
 end

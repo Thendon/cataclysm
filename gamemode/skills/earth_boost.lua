@@ -53,7 +53,8 @@ if SERVER then
         local dot = caster:GetAimVector():Dot(_VECTOR.UP)
         dir.z = math.Clamp(dot, 0.5, 1)
         caster:SetVelocity( dir * 750 )
-        caster:SetFallImmune( 30 )
+        caster:SetFallDamper(30, 0.5, 2)
+        --caster:SetFallImmune( 30 )
     end
 end
 

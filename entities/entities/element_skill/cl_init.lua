@@ -10,6 +10,7 @@ end
 function ENT:Draw()
 	local skill = self:GetSkill()
 	ecall(skill.Draw, skill, self)
+	if (self:GetCustomCollider()) then self.collider:Draw() end
 	if (self:GetInvisible()) then return end
 	self:DrawModel()
 end
