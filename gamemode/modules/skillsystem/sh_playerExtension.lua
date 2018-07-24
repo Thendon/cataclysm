@@ -9,6 +9,9 @@ if CLIENT then
         if !self:CanActivateSkill( key ) then return end
 
         local ret = self:CastSkill( key, pressing )
+
+        --TODO add hold key stuff here
+
         if (!ret) then return end
 
         if (istable(ret)) then

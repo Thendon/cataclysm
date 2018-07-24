@@ -14,3 +14,12 @@ function ENT:Draw()
 	if (self:GetInvisible()) then return end
 	self:DrawModel()
 end
+
+function ENT:Think()
+    if (!self:Update()) then return end
+	if (!IsValid(self:GetCaster())) then return end
+
+	self:UpdateSkill( stage )
+
+    return true
+end

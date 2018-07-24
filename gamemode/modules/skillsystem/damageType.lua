@@ -20,7 +20,6 @@ end
 if CLIENT then
     function DamageType:Hit( ent )
         if (self.particleEffect) then
-            print(self.particleEffect)
             CreateParticleSystem( ent, self.particleEffect, PATTACH_ABSORIGIN, 0, Vector( 0, 0, 50 ) )
         end
         self:HitEffect( ent )

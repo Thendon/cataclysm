@@ -72,14 +72,14 @@ function bounds.pointInCapsule( p1, p2, radiusSqr, pTest )
         end
     end
 
-    if lowestDistance then return distance end
+    if lowestDistance then return lowestDistance end
 
     return false
 end
 
 local function callbackOnAttachmentsOf( ent, callback )
     local attachments = ent:GetAttachments()
-    if (!attachments or table.Empty(attachments)) then
+    if (!attachments or table.Count(attachments) <= 0) then
         return callback( ent:GetPos() )
     end
 
@@ -108,12 +108,12 @@ function bounds.entInCapsule( ent, p1, p2, radiusSqr )
     end)
 end
 
-local function somethingInSomething( list, blacklist, radiusSqr, func, ... )
+local function objectInCollider( list, blacklist, radiusSqr, func, ... )
     blacklist = blacklist or {}
     local inside = {}
     for _, obj in next, list do
         if blacklist[obj] then continue end
-        local distance = bounds[func]( obj, ..., radiusSqr )
+        local distance = func( obj, ..., radiusSqr )
         if distance then table.insert( inside, { obj = obj, distance = distance } ) end
     end
     return inside
@@ -142,3 +142,14 @@ function bounds.objectsInSphere( list, pos, radiusSqr, blacklist )
 end
 
 _G.bounds = bounds
+
+local epsilon = 0.0001
+
+_G.CalcUpRight = function( forward )
+    local tempForward = forward
+    if (forward == _VECTOR.UP) then tempForward = forward + Vector(epsilon, 0, 0) end
+    local right = tempForward:Cross( _VECTOR.UP ):GetNormalized()
+    local up = forward:Cross( right )
+
+    return up, right
+end

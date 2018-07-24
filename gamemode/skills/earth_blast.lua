@@ -83,14 +83,7 @@ if SERVER then
 
         local damage = math.min( math.sqrt(speed - damage_min_speed) * damage_factor, damage_on_hit )
 
-        local dmg = DamageInfo()
-        dmg:SetDamageType(DMG_CRUSH)
-        dmg:SetAttacker(ent)
-        dmg:SetInflictor(ent:GetCaster())
-        dmg:SetDamageForce(velocity) //TODO MIT MARTEN TESTEN OB RAGDOLL BALLERT :)
-        dmg:SetDamage(damage)
-
-        touched:TakeDamageInfo(dmg)
+        self:Hit(ent, touched, damage, DMG_CRUSH, velocity)
     end
 end
 

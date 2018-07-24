@@ -41,16 +41,14 @@ if SERVER then
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( rate )
         ent:SetCustomCollider( Capsule( col ) )
+        ent:SetCollideWithSkills( true )
     end
 
     function skill:Touch( ent, touched )
-        local dot = ent:GetForward():Dot( touched:GetPos() - ent:GetPos() )
-        local hitPos = ent:LocalToWorld(Vector(dot,0,0))
-        local velocity = (touched:GetPos() - hitPos):GetNormalized()
-        velocity = velocity * power
-        velocity.z = math.max(math.abs(velocity.z),200)
-
-        touched:SetVelocity( velocity )
+        local velocity = ent:GetCustomCollider():GetDirectionTo( touched )
+        velocity = velocity:GetNormalized() * power
+        velocity.z = touched:OnGround() and 250 or 50
+        touched:ReachVelocity( velocity )
     end
 end
 

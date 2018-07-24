@@ -51,7 +51,7 @@ if SERVER then
         local damage = distance - (ent.alive * distance)
         damage = damage * 0.1
 
-        self:Hit(ent, ent:GetCaster(), touched, damage, DMG_FALL, ent:GetForward())
+        self:Hit(ent, touched, damage, DMG_FALL, ent:GetForward())
     end
 end
 

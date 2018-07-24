@@ -1,38 +1,39 @@
 local skill = Skill( "air_shield" )
-skill:SetMaxLive( 10 )
+local immune = 5
+local rate = 0.5
+
+local stage2 = immune - 2
+skill:SetMaxLive( immune )
 skill:SetCooldown( 0.5 )
+skill:SetStages( { stage2 } )
 
-local power = 1000
-
-local particles = {
-    "element_air_trail_move",
-    "element_air_trail_move2"
-}
-
-local sounds = {
-    "air_push",
-    "air_push2"
-}
-
-local rate = 0.1
-
+ --todo make sphere collider
+ --its fine though, only first sphere will be calced
 local col = Capsule(Vector(), Vector(), 100)
-col:SetPos1Dest(Vector(0,0,0))
-col:SetPos2Dest(Vector(0,0,1000))
 
 function skill:Stage1( ent )
-    local fraction = 1 + ent.alive
-    ent:GetCustomCollider():SetFraction(fraction * fraction - 1)
+    ent:SetPos( ent:GetCaster():GetPos() + _VECTOR.UP * 50 )
+end
 
-    if CLIENT then return end
+function skill:Transition1( ent )
+    ent:StopSound("air_storm2")
+    ent:StopParticles()
+end
+
+function skill:Stage2( ent )
+    ent:SetPos( ent:GetCaster():GetPos() + _VECTOR.UP * 50 )
 end
 
 if CLIENT then
     function skill:Activate( ent, caster )
         caster:PlayAnimation("shoot_fire" .. math.random(1,2))
-        sound.Play(sounds[math.random(1, 2)], caster:GetPos())
-        ent:CreateParticleEffect(particles[math.random(1,2)], 1)
-        ent:SetCustomCollider( Capsule( col ) )
+        ent:EmitSound("air_storm2")
+        ent:CreateParticleEffect("element_air_shield", 1)
+        --ent:SetCustomCollider( Capsule( col ) )
+    end
+
+    function skill:OnRemove( ent )
+        ent:StopSound("air_storm2")
     end
 end
 
@@ -43,9 +44,21 @@ if SERVER then
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( rate )
         ent:SetCustomCollider( Capsule( col ) )
+        ent:SetCollideWithPlayers( false )
+        ent:SetCollideWithSkills( true )
+        ent:RemoveOnDeath()
 
-        local ang = caster:GetAimVector():Angle()
-        ent:SetAngles(ang)
+        caster:SetSkillImmune( immune )
+        caster:SetFallImmune( immune )
+    end
+
+    function skill:StartTouch( ent, touched )
+        if ent:IsPlayer() then return end
+
+        local physObj = ent:GetPhysicsObject()
+        if (!IsValid(physObj)) then return end
+
+        physObj:SetVelocity(-physObj:GetVelocity())
     end
 end
 

@@ -238,7 +238,7 @@ name = "storm"
 sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
-	volume = 1,
+	volume = 0.25,
 	level = 100,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
@@ -248,7 +248,7 @@ name = "storm2"
 sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
-	volume = 1,
+	volume = 0.25,
 	level = 100,
 	pitch = { 95, 110 },
 	sound = path .. name .. format

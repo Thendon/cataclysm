@@ -1,6 +1,7 @@
 local skill_manager = {}
 
 local skills = {}
+local instances = {}
 local damageTypes = {}
 
 function skill_manager.Register( skill )
@@ -9,6 +10,36 @@ end
 
 function skill_manager.GetSkill( index )
     return skills[index]
+end
+
+function skill_manager.NewInstance( ent )
+    table.insert(instances, ent)
+end
+
+function skill_manager.GetAll()
+    local i = 1
+    while i <= table.Count(instances) do
+        if !IsValid(instances[i]) then
+            table.remove(instances, i)
+            continue
+        end
+        i = i + 1
+    end
+    return instances
+end
+
+function skill_manager.PlayerDeath(victim)
+    local skillEnts = skill_manager.GetAll()
+    for _, ent in next, skillEnts do
+        local players = ent:GetRemoveOnDeath()
+        if (!players) then continue end
+
+        for _, ply in next, players do
+            if (!IsValid(ply)) then continue end
+            if (ply != victim) then continue end
+            ent:Remove()
+        end
+    end
 end
 
 function skill_manager.RegisterDamageType( type )

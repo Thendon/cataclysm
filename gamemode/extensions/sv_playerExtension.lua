@@ -23,8 +23,10 @@ local STATUS = {}
 STATUS.SILENCED = 1
 STATUS.CASTING = 2
 STATUS.FALLIMMUNE = 3
-STATUS.FALLDAMPED = 4
-STATUS.SLOWED = 5
+STATUS.SKILLIMMUNE = 4
+STATUS.FALLDAMPED = 5
+STATUS.SLOWED = 6
+STATUS.ROOTED = 7
 
 speedEpsilon = speedEpsilon * speedEpsilon
 
@@ -75,14 +77,13 @@ function player:HitWorld( speed, direction )
     if !self:Alive() then return end
 
     if self:IsFallImmune() then return end
-
     if ((CurTime() - self:LastPhysHit()) < waitAfterPhysHit) then return end
     self:UpdateLastPhysHit()
 
     local damage = speed * speedDamageFactor
 
     local dmg = DamageInfo()
-    dmg:SetDamageType(DMG_GENERIC)
+    dmg:SetDamageType(DMG_GENERIC) --DMG_FALL
     dmg:SetAttacker(game.GetWorld())
     dmg:SetInflictor(game.GetWorld())
     dmg:SetDamage(damage)
@@ -97,8 +98,45 @@ function player:HitWorld( speed, direction )
     end
 end
 
+function player:LastPhysHit()
+    return self.lastPhysHit or 0
+end
+
+function player:UpdateLastPhysHit()
+    self:SetFallImmune( false )
+    self.lastPhysHit = CurTime()
+end
+
+--[[function player:PhysHit( velocity )
+    self:UpdateLastPhysHit()
+    self:SetVelocity( velocity )
+end]]
+
+function player:TakeSkillDamage( dmgInfo, dmgType )
+    if self:IsSkillImmune() then return end
+
+    self:TakeDamageInfo(dmgInfo)
+    dmgType:Hit( self )
+end
+
+function player:Heal( amount, type )
+    local hp = math.Clamp(self:Health() + amount, 0, self:GetMaxHealth())
+    self:SetHealth( hp )
+    type:Hit( self )
+end
+
 function player:OnDeath( inflictor, attacker )
     sound.Play(table.Random(deathsounds), self:GetPos(), 80, 100, 1)
+    skill_manager.PlayerDeath(self)
+    self:ResetStatus()
+end
+
+function player:ResetStatus()
+    self.status = self.status or {}
+
+    for k, status in next, self.status do
+        self.status[k] = 0
+    end
 end
 
 function player:SetStatusTime( status, time )
@@ -116,10 +154,6 @@ function player:HasStatus( status )
     return false
 end
 
-function player:IsSilenced()
-    return self:HasStatus( STATUS.SILENCED )
-end
-
 function player:Silence( time )
     self:SetStatusTime( STATUS.SILENCED, time )
 end
@@ -128,24 +162,32 @@ function player:Unsilence()
     self:SetStatusTime( STATUS.SILENCED )
 end
 
-function player:IsCasting()
-    return self:HasStatus( STATUS.CASTING )
+function player:IsSilenced()
+    return self:HasStatus( STATUS.SILENCED )
 end
 
 function player:SetCasting( time )
     self:SetStatusTime( STATUS.CASTING, time )
 end
 
-function player:IsFallImmune()
-    return self:HasStatus( STATUS.FALLIMMUNE )
+function player:IsCasting()
+    return self:HasStatus( STATUS.CASTING )
+end
+
+function player:SetSkillImmune( time )
+    self:SetStatusTime( STATUS.SKILLIMMUNE, time )
+end
+
+function player:IsSkillImmune()
+    return self:HasStatus( STATUS.SKILLIMMUNE )
 end
 
 function player:SetFallImmune( time )
     self:SetStatusTime( STATUS.FALLIMMUNE, time )
 end
 
-function player:IsFallDamped()
-    return self:HasStatus( STATUS.FALLDAMPED )
+function player:IsFallImmune()
+    return self:HasStatus( STATUS.FALLIMMUNE )
 end
 
 function player:SetFallDamper( time, factor, factorFactor )
@@ -161,8 +203,8 @@ function player:GetFallDamper()
     return math.Clamp(fallFactor,0,1)
 end
 
-function player:IsSlowed()
-    return self:HasStatus( STATUS.SLOWED )
+function player:IsFallDamped()
+    return self:HasStatus( STATUS.FALLDAMPED )
 end
 
 function player:Slow( time, factor )
@@ -175,16 +217,15 @@ function player:GetSlowFactor()
     return self.slowFactor
 end
 
-function player:LastPhysHit()
-    return self.lastPhysHit or 0
+function player:IsSlowed()
+    return self:HasStatus( STATUS.SLOWED )
 end
 
-function player:UpdateLastPhysHit()
-    self:SetFallImmune( false )
-    self.lastPhysHit = CurTime()
+function player:Root( time )
+    self:SetStatusTime( STATUS.ROOTED, time )
+    self.slowFactor = 0.001
 end
 
---[[function player:PhysHit( velocity )
-    self:UpdateLastPhysHit()
-    self:SetVelocity( velocity )
-end]]
+function player:IsRooted()
+    return self:HasStatus( STATUS.ROOTED )
+end
