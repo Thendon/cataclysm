@@ -5,33 +5,49 @@ AccessorFunc( ENT, "destroy", "DestroyFlag", FORCE_BOOL )
 AccessorFunc( ENT, "trigger", "TriggerFlag", FORCE_BOOL )
 AccessorFunc( ENT, "casterCollision", "CasterCollision", FORCE_BOOL )
 AccessorFunc( ENT, "removeOnWorldTrace", "RemoveOnWorldTrace", FORCE_BOOL )
-AccessorFunc( ENT, "removeOnDeath", "RemoveOnDeath", FORCE_BOOL )
 AccessorFunc( ENT, "touchPlayerOnce", "TouchPlayerOnce", FORCE_BOOL )
 AccessorFunc( ENT, "touchCaster", "TouchCaster", FORCE_BOOL )
-AccessorFunc( ENT, "touchAllEnts", "TouchAllEnts", FORCE_BOOL )
 AccessorFunc( ENT, "touchRate", "TouchRate", FORCE_NUMBER )
+AccessorFunc( ENT, "collidePlayers", "CollideWithPlayers", FORCE_BOOL )
+AccessorFunc( ENT, "collideSkills", "CollideWithSkills", FORCE_BOOL )
 
 function ENT:Initialize()
     self:DrawShadow( false )
     self:SetBirth( CurTime() )
     self.loaded = true
+end
 
-    self.touchCooldown = {}
-    self.casterCollision = self.casterCollision or false
-    self.removeOnWorldTrace = self.removeOnWorldTrace or false
-    self.removeOnDeath = self.removeOnDeath or false
-    self.touchPlayerOnce = self.touchPlayerOnce or false
-    self.touchCaster = self.touchCaster or false
-    self.touchAllEnts = self.touchAllEnts or false
-    self.touchRate = self.touchRate or 1
-    self.touchedPlayers = {}
+function ENT:Think()
+    if (!self:Update()) then return end
+
+    if ( !IsValid(self:GetCaster()) ) then --TODO validate target
+        self:SetCaster(game.GetWorld())
+        self:Remove()
+        return
+    end
+
+    if ( self:GetDestroyFlag() ) then self:Remove() end
+    if ( self:GetRemoveOnWorldTrace() ) then self:CheckWorldTrace() end
+    if ( self:GetCustomCollider() ) then self:CalcCustomCollisions() end
+
+    local stage = self:GetNW2Int("stage")
+    if self.skill.stages[stage] and self.alive > self.skill.stages[stage] then
+        self:SetNW2Int("stage", stage + 1)
+    end
+
+    local skill = self:UpdateSkill( stage )
+    skill:HandleDots( self )
+
+    if ( self.alive > self:GetMaxLive() ) then self:Remove() end
+
+    return true
 end
 
 local function shouldTouchContinue( ent, touched )
     if (!ent:GetTriggerFlag()) then return false end
 
     if (touched:IsPlayer()) then
-        if (ent:GetTouchCaster() and ent:GetCaster() == touched) then
+        if (!ent:GetTouchCaster() and ent:GetCaster() == touched) then
             return false
         end
 
@@ -43,7 +59,7 @@ local function shouldTouchContinue( ent, touched )
 
     local now = CurTime()
     ent.touchCooldown[touched] = ent.touchCooldown[touched] or 0
-    if (ent.touchCooldown[touched] > now ) then return false end
+    if (ent.touchCooldown[touched] > now) then return false end
     ent.touchCooldown[touched] = now + ent.touchRate
 
     return true
@@ -64,7 +80,6 @@ function ENT:Touch(ent)
     if (!shouldTouchContinue(self, ent)) then return end
     ecall( skill.Touch, skill, self, ent )
 end
-
 
 function ENT:PhysicsCollide( data, phys )
     local skill = self:GetSkill()
@@ -109,4 +124,37 @@ function ENT:CheckWorldTrace()
     })
 
     if (tr.StartSolid) then self:Remove() end
+end
+
+function ENT:CalcCustomCollisions()
+    local touchingBefore = self.touching
+    self.touching = {}
+    local list = {}
+
+    if self:GetCollideWithPlayers() then
+        table.Add(list, player.GetAll())
+    end
+    if self:GetCollideWithSkills() then
+        table.Add(list, skill_manager.GetAll())
+    end
+
+    local touching = self.collider:GetTouchedObjects( list )
+    for _, hit in next, touching do
+        self.touching[hit.obj] = hit.distance
+    end
+
+    for obj, distance in next, self.touching do
+        self:Touch( obj )
+        if touchingBefore[obj] then continue end
+        self:StartTouch( obj )
+    end
+end
+
+function ENT:RemoveOnDeath( target )
+    if !istable(target) then target = { target } end
+    self.removeOnDeath = target or { self:GetCaster() }
+end
+
+function ENT:GetRemoveOnDeath()
+    return self.removeOnDeath
 end

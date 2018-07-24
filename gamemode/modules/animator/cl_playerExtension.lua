@@ -21,8 +21,9 @@ function player:UpdateAnimation()
 
     self.animState = self.animState + FrameTime() * self.anim.speed
 
-    local animID, animWeight = self.anim:GetInfos( self.animState )
+    local animID, animWeight, sound = self.anim:GetInfos( self.animState )
     if ( animID == -1 ) then self.anim = nil return end
+    if ( sound ) then self:EmitSound(sound) end
 
     self:AnimRestartGesture( GESTURE_SLOT_CUSTOM, animID, true )
     self:AnimSetGestureWeight( GESTURE_SLOT_CUSTOM, math.abs(animWeight) )

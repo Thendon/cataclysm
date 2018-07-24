@@ -47,26 +47,21 @@ function Capsule:SetFraction( fraction )
     return self.pos1Lerped, self.pos2Lerped
 end
 
-function Capsule:PlayersTouched()
+function Capsule:GetTouchedObjects( list )
     local pos1 = self:PosToWorld(self.pos1Lerped)
     local pos2 = self:PosToWorld(self.pos2Lerped)
-    return bounds.objectsInCapsule(player.GetAll(), pos1, pos2, self.radiusSqr, self.filtered)
-end
-
-function Capsule:EntitiesTouched()
-    local pos1 = self:PosToWorld(self.pos1Lerped)
-    local pos2 = self:PosToWorld(self.pos2Lerped)
-    return bounds.objectsInCapsule(ents.GetAll(), pos1, pos2, self.radiusSqr, self.filtered)
+    return bounds.objectsInCapsule(list, pos1, pos2, self.radiusSqr, self.filtered)
 end
 
 function Capsule:Draw()
     local pos1 = self:PosToWorld( self.pos1Lerped )
     local pos2 = self:PosToWorld( self.pos2Lerped )
 
-    local step = 2 * math.pi / drawDetail
+    local up, right = CalcUpRight( self:GetForward() )
 
-    local right = -_VECTOR.RIGHT * self.radius
-    local up = _VECTOR.UP * self.radius
+    local step = 2 * math.pi / drawDetail
+    right = right * self.radius
+    up = up * self.radius
     for i = 1, drawDetail do
         local offsetRight = right * math.cos(i * step)
         local offsetUp = up * math.sin(i * step)
@@ -79,6 +74,15 @@ function Capsule:Draw()
 
     render.DrawWireframeSphere( pos1, self.radius, drawDetail, drawDetail, _COLOR.GREEN, true )
     render.DrawWireframeSphere( pos2, self.radius, drawDetail, drawDetail, _COLOR.GREEN, true )
+end
+
+function Capsule:GetNearestPointTo( ent )
+    local dot = self:GetForward():Dot( ent:GetPos() - self.Entity:GetPos() )
+    return self:PosToWorld(Vector(dot,0,0))
+end
+
+function Capsule:GetDirectionTo( ent )
+    return ent:GetPos() - self:GetNearestPointTo( ent )
 end
 
 function Capsule:SetRadius(radius)
@@ -106,16 +110,5 @@ function Capsule:PosToWorld( pos )
 end
 
 function Capsule:GetForward()
-    if !self.Entity then return _VECTOR.FOR end
-    return self.Entity:GetForward()
-end
-
-function Capsule:GetRight()
-    if !self.Entity then return _VECTOR.RIGHT end
-    return self.Entity:GetRight()
-end
-
-function Capsule:GetUp()
-    if !self.Entity then return _VECTOR.UP end
-    return self.Entity:GetUp()
+    return (self.pos2Lerped - self.pos1Lerped):GetNormalized()
 end

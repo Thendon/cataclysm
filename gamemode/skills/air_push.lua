@@ -46,6 +46,8 @@ if SERVER then
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( rate )
         ent:SetCustomCollider( Capsule( col ) )
+        ent:SetCollideWithSkills( true )
+        ent:RemoveOnDeath()
 
         local ang = caster:GetAimVector():Angle()
         ent:SetAngles(ang)

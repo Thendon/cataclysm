@@ -30,7 +30,19 @@ end
 function GM:PlayerDeathSound()
     return true
 end
+--[[
+local lastThink = 0
+local deltaTime = 0
+_G.DeltaTime = function()
+    return deltaTime
+end
 
+function GM:Think()
+    local now = CurTime()
+    DeltaTime = now - lastThink
+    lastThink = now
+end
+]]
 function GM:DeathMessage( victim, inflictor, attacker )
     netstream.Start(player.GetAll(), "DeathMessage", victim, attacker:GetName(), inflictor)
 end

@@ -57,7 +57,7 @@ if SERVER then
     function skill:Touch( ent, touched )
         local factor = (distance - ent.alive * distance) / distance
 
-        self:Hit(ent, ent:GetCaster(), touched, damage * factor, DMG_FALL, ent:GetForward())
+        self:Hit(ent, touched, damage * factor, DMG_FALL, ent:GetForward())
     end
 end
 

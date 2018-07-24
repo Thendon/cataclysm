@@ -81,14 +81,14 @@ function skill:OnRemove( ent )
 
     local pos = ent:GetPos()
 
-    local hits = bounds.playersInSphere( pos, blastRange )
+    local hits = bounds.objectsInSphere( player.GetAll(), pos, blastRange )
     for _, hit in next, hits do
         local damage = ( 1 - hit.distance / blastRange ) * blastDamage
-        print(hit.ply, damage)
-        local velocity = hit.ply:GetPos() - pos
+        --print(hit.ply, damage)
+        local velocity = hit.obj:GetPos() - pos
         velocity.z = velocity.z + 100
-        hit.ply:SetVelocity(velocity:GetNormalized() * blastPower * damage)
-        self:Hit(ent, ent:GetCaster(), hit.ply, damage, DMG_FALL, velocity)
+        hit.obj:SetVelocity(velocity:GetNormalized() * blastPower * damage)
+        self:Hit(ent, hit.obj, damage, DMG_FALL, velocity)
     end
 end
 

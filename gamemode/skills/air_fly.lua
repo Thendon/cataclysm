@@ -3,10 +3,6 @@ local skill = Skill( "air_fly" )
 skill:SetMaxLive( 10 )
 skill:SetCooldown( 0.5 )
 
-local col = Capsule(Vector(100,0,0), Vector(100,0,0), 100)
-col:SetPos1Dest(Vector(100,0,0))
-col:SetPos2Dest(Vector(900,0,0))
-
 function skill:Stage1( ent )
     local caster = ent:GetCaster()
     ent:SetPos( caster:GetPos() )
@@ -28,7 +24,7 @@ if SERVER then
     function skill:Spawn( ent, caster )
         ent:SetInvisible( true )
         caster:SetVelocity(_VECTOR.UP * 300)
-        ent:SetRemoveOnDeath( true )
+        ent:RemoveOnDeath()
     end
 end
 

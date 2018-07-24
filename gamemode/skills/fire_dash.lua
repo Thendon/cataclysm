@@ -27,6 +27,10 @@ if CLIENT then
         ent:EmitSound("fire_burst")
         ent:CreateParticleEffect("element_fire_dash", 1)
     end
+
+    function skill:OnRemove( ent )
+        ent:StopSound("fire_burst")
+    end
 end
 
 if SERVER then
@@ -35,11 +39,7 @@ if SERVER then
         ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() )
         local forward = caster:GetRight():Cross(_VECTOR.UP)
         ent:SetAngles( forward:Angle() )
-
-        function ent:OnRemove()
-            self:StopSound("fire_burst")
-        end
-
+        ent:RemoveOnDeath()
         caster:SetFallDamper( 1.5, 0.25 )
         --caster:SetFallImmune( 1.5 )
     end
