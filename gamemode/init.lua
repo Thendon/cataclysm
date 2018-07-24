@@ -49,6 +49,7 @@ function GM:ShouldCollide(ent1, ent2)
 end
 
 function GM:EntityTakeDamage( ent, dmg )
+    --TODO remove physics damage to player
     if (dmg:GetInflictor().isskill) then return true end
 end
 
