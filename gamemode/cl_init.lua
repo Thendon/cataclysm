@@ -1,17 +1,29 @@
 include( "shared.lua" )
-
---require("tdlib")
---include("ressources/fonts.lua")
+include( "cl_hud.lua" )
 
 local loaded = false
+local BGSVolume = 0.25
+local healthDistance = 1000
+healthDistance = healthDistance * healthDistance
 
 function GM:UpdateAnimation( ply )
     ply:UpdateAnimation()
 end
 
+_G.PlayBGS = function( file )
+    sound.PlayFile("sound/" .. file, "noplay", function( channel )
+        if !IsValid( channel ) then print("couldnt play bgs: " .. tostring(file)) return end
+        if !system.HasFocus() then return end
+
+        channel:SetVolume(BGSVolume)
+        channel:Play()
+    end)
+end
+
 function GM:FinishedLoading()
     netstream.Start("GM:FinishedLoading")
     skill_manager.Initialize()
+
     loaded = true
 end
 
@@ -23,48 +35,14 @@ function GM:PreDrawHalos()
     skill_manager.CleverHalo()
 end
 
-local healthDistance = 1000
-healthDistance = healthDistance * healthDistance
-
-local hpLerpSpeed = 0.4
-
-local function CalcHealthFactor( ply )
-    local maxHP = ply:GetMaxHealth()
-    ply.lastHealthFactor = ply.lastHealthFactor or 1
-    local actualHP = math.Clamp(ply:Health() / maxHP, 0, 1)
-
-    ply.lastHealthFactor = Lerp(hpLerpSpeed, ply.lastHealthFactor, actualHP)
-    return ply.lastHealthFactor
-end
-
-function GM:DrawPlayerHealthbar(ply)
-    local x,y = -25, -5
-    local w,h = 50, 5
-    local teamColor = team.GetColor(ply:Team())
-    --[[surface.SetDrawColor( _COLOR.RED )
-    surface.DrawRect(x,y, w,h)
-    surface.SetDrawColor( team.GetColor(ply:Team()) )
-    surface.DrawRect(x,y, w * CalcHealthFactor( ply ),h)
-    surface.DrawOutlinedRect( x,y, w,h )
-    surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
-    surface.DrawTexturedRect(x - 5 , y - 5, 16,16)]]
-    surface.SetDrawColor( teamColor )
-    surface.DrawRect(x, y, w, h)
-    surface.SetDrawColor( _COLOR.RED )
-    local factor = CalcHealthFactor( ply )
-    surface.DrawRect( x + w * factor, y+1, w * (1 - factor), h-2)
-    surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
-    surface.DrawTexturedRect(x - 15, y - 5, 16,16)
-end
-
 function GM:GetEnemyTeamColor( player )
-    local teamID = player:Team() == 1 and 2 or 1
+    local teamID = self:GetEnemyTeam( player )
     return self:GetTeamNumColor( teamID )
 end
 
 netstream.Hook("DeathMessage", function( victim, attacker, inflictor )
+    if !IsValid(victim) or victim:IsSpectator() then return end
+
     local teamColor = GAMEMODE:GetEnemyTeamColor(victim)
 
     local text = {}
@@ -95,55 +73,52 @@ netstream.Hook("DeathMessage", function( victim, attacker, inflictor )
     chat.AddText(unpack(text))
 end)
 
-hook.Add("PostPlayerDraw", "Healthbars", function( ply )
-    if ( ply == LocalPlayer() ) then return end
-    if (!IsValid(ply)) then return end
-    if (!ply:Alive()) then return end
-
-    local plyPos = ply:GetPos()
-    if (healthDistance < (plyPos - LocalPlayer():GetPos()):LengthSqr()) then return end
-
+local function GetEyeBounds()
     local eyeAng = EyeAngles()
-    local offset = Vector(0,0,80)
     eyeAng:RotateAroundAxis(eyeAng:Forward(), -90)
     eyeAng:RotateAroundAxis(eyeAng:Right(), 90)
     eyeAng:RotateAroundAxis(eyeAng:Up(), 180)
 
-    cam.Start3D2D(plyPos + offset, eyeAng, 1)
-    hook.Call("DrawPlayerHealthbar", GAMEMODE, ply)
-    cam.End3D2D()
-end)
+    return eyeAng
+end
 
-function GM:PaintHealthbar()
-    local ply = LocalPlayer()
-    local x,y = 64, ScrH() - 96
-    local w,h = 500, 50
-    local teamColor = team.GetColor(ply:Team())
-    --[[surface.SetDrawColor( _COLOR.RED )
-    surface.DrawRect(x,y, w,h)
-    surface.SetDrawColor( team.GetColor(ply:Team()) )
-    surface.DrawRect(x,y, w * CalcHealthFactor( LocalPlayer() ),h)
-    surface.DrawOutlinedRect( x,y, w,h )
-    surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
-    surface.DrawTexturedRect(x - 50 ,y - 50, 128,128)]]
-    surface.SetDrawColor( teamColor )
-    surface.DrawRect(x, y, w, h)
-    surface.SetDrawColor( _COLOR.RED )
-    local factor = CalcHealthFactor( ply )
-    surface.DrawRect( x + w * factor, y+5, w * (1 - factor), h-10)
-    surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
-    surface.DrawTexturedRect(x - 50 ,y - 50, 128,128)
+local function ShouldDrawPlayerInfos(ply)
+    if ( ply == LocalPlayer() ) then return false end
+    if (!IsValid(ply)) then return false end
+    if (!ply:Alive()) then return false end
+
+    local plyPos = ply:GetPos()
+    if (healthDistance < (plyPos - LocalPlayer():GetPos()):LengthSqr()) then return false end
+    return plyPos
 end
 
 function GM:HUDShouldDraw( name )
     if (name == "CHudHealth") then return false end
+    if (name == "CHudCrosshair") then return false end
     return true
 end
 
+function GM:ScoreboardShow()
+    ele_scoreboard:Show()
+end
+
+function GM:ScoreboardHide()
+    ele_scoreboard:Hide()
+end
+
+--going for the stupid way, garry xD
+function GM:HUDDrawScoreBoard()
+    if ele_scoreboard:Hidden() then return end
+
+    hook.Call("PaintRound", GAMEMODE)
+end
+
 hook.Add("HUDPaint", "Healthbar", function()
+    if LocalPlayer():IsSpectator() then return end
+
     hook.Call("PaintHealthbar", GAMEMODE)
+    hook.Call("PaintRoundState", GAMEMODE)
+    hook.Call("PaintScore", GAMEMODE)
 end)
 
 hook.Add("Think", "LoadingStatus", function()
@@ -151,4 +126,30 @@ hook.Add("Think", "LoadingStatus", function()
 
     hook.Call("FinishedLoading", GAMEMODE)
     hook.Remove("Think", "LoadingStatus")
+end)
+
+hook.Add("PostPlayerDraw", "Healthbars", function( ply )
+    local eyeAng = GetEyeBounds()
+    local offset = Vector(0,0,80)
+
+    local plyPos = ShouldDrawPlayerInfos(ply)
+    if !plyPos then return end
+
+    cam.Start3D2D(plyPos + offset, eyeAng, 1)
+    hook.Call("DrawPlayerHealthbar", GAMEMODE, ply)
+    cam.End3D2D()
+end)
+
+hook.Add("PostDrawOpaqueRenderables", "ClassIcons", function()
+    local eyeAng = GetEyeBounds()
+    local offset = Vector(0,0,80)
+
+    for k, ply in next, player.GetAll() do
+        local plyPos = ShouldDrawPlayerInfos(ply)
+        if !plyPos then continue end
+
+        cam.Start3D2D(plyPos + offset, eyeAng, 1)
+        hook.Call("DrawPlayerClass", GAMEMODE, ply)
+        cam.End3D2D()
+    end
 end)

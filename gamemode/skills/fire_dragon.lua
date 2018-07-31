@@ -20,7 +20,7 @@ function skill:Stage1( ent )
     ent:GetCustomCollider():SetFraction(ent.alive * 2)
 end
 
-function skill:CanBeActivated( caster )
+function skill:ActivationConditions( caster )
     return caster:WaterLevel() < 2
 end
 

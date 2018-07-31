@@ -1,0 +1,1 @@
+local gm_uldum2 = ""

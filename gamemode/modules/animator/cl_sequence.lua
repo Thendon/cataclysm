@@ -1,8 +1,6 @@
 
 _G.Sequence = Sequence or Class()
 
-AccessorFunc( Sequence, "sound", "Sound" )
-
 --[[local function validateAct( actID )
     if (!table.HasValue(VALID_ACTS, actID)) then
         error("act " .. tostring(actID) .. " invalid")
@@ -20,5 +18,15 @@ end
 
 function Sequence:GetInfos( state, starting )
     local weight = self.startW + state * (self.endW - self.startW)
-    return self.actID, weight, starting and self.sound
+    return self.actID, weight, starting and self:GetSound()
+end
+
+function Sequence:SetSound( sounds )
+    if !istable(sounds) then sounds = { sounds } end
+    self.sounds = sounds
+end
+
+function Sequence:GetSound()
+    if !self.sounds then return false end
+    return self.sounds[math.random(1, table.Count(self.sounds))]
 end

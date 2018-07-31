@@ -3,6 +3,7 @@ earth_push:SetMaxLive( 5 )
 earth_push:SetCleverCast( true )
 earth_push:SetCooldown( 1 )
 earth_push:SetDamageType( "earth" )
+earth_push:SetRange( 2000 )
 
 local end_up = 0.35
 local pushPower = 1000
@@ -26,7 +27,7 @@ function earth_push:Transition1( ent )
     if SERVER then ent:InitPhys(ELEMENT_PHYS_TYPE.SOLID) end
 end
 
-function earth_push:CanBeActivated( caster )
+function earth_push:ActivationConditions( caster )
     return caster:OnGround()
 end
 
@@ -45,6 +46,7 @@ if SERVER then
         ent:SetPos( cleverData.pos - cleverData.dir * 100 )
         cleverData.ang:RotateAroundAxis(cleverData.dir, math.random(1, 360))
         ent:SetAngles( cleverData.ang )
+        ent:SetTouchCaster( true )
         ent:SetNW2Vector( "endPos", cleverData.pos + cleverData.dir * 50 )
 
         function ent:OnRemove()

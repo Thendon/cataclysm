@@ -11,7 +11,7 @@ local stage3 = start + drownTime
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
 skill:SetMaxLive( start + drownTime * 2 )
-skill:SetCooldown( 0.5 )
+skill:SetCooldown( 20 )
 skill:SetRange( 500 )
 skill:SetDamageType( "water" )
 skill:SetStages({ start, stage2, stage3 })
@@ -83,7 +83,7 @@ if SERVER then
         ent:SetNW2Vector("endPos", pos + _VECTOR.UP * 100)
         ent:RemoveOnDeath( cleverData.target )
 
-        cleverData.target:SetMoveType(MOVETYPE_FLY)
+        cleverData.target:SetMoveType(MOVETYPE_CUSTOM)
         cleverData.target:Silence( drownTime )
         --cleverDate.target:Root( drownTime )
     end

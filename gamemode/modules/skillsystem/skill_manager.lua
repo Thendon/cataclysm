@@ -28,6 +28,12 @@ function skill_manager.GetAll()
     return instances
 end
 
+function skill_manager.Clear()
+    for k, skill in next, skill_manager.GetAll() do
+        skill:Remove()
+    end
+end
+
 function skill_manager.PlayerDeath(victim)
     local skillEnts = skill_manager.GetAll()
     for _, ent in next, skillEnts do
@@ -72,93 +78,130 @@ function skill_manager.Initialize()
     skill_manager.csent = csent
 end
 
-function skill_manager.CleverHalo()
-    skill_manager.HaloCSEnt()
-    skill_manager.HaloPlayer()
-end
-
-function skill_manager.HaloColor()
-    return player_manager.RunClass(LocalPlayer(), "GetClassColor")
-end
-
-function skill_manager.HaloCSEnt()
-    if ( !IsValid(skill_manager.csent) ) then return end
-    if ( skill_manager.csent:Hidden() ) then return end
-    halo.Add( { skill_manager.csent }, skill_manager.HaloColor(), 3, 3, 1, false, true)
-end
-
-function skill_manager.HaloPlayer()
-    if ( !IsValid(skill_manager.ccply) ) then return end
-    halo.Add( { skill_manager.ccply }, skill_manager.HaloColor(), 3, 3, 1, false, true)
-end
-
-function skill_manager.CleverCastPlayer( pressing, trace )
-    if (!trace.Entity or !trace.Entity:IsPlayer()) then
-        skill_manager.ccply = nil
-        return false
+if CLIENT then
+    function skill_manager.CleverHalo()
+        skill_manager.HaloCSEnt()
+        skill_manager.HaloPlayer()
     end
 
-    if (!pressing) then
-        skill_manager.ccply = nil
-        return { target = trace.Entity }
+    function skill_manager.HaloColor()
+        return player_manager.RunClass(LocalPlayer(), "GetClassColor")
     end
 
-    skill_manager.ccply = trace.Entity
+    function skill_manager.HaloCSEnt()
+        if ( !IsValid(skill_manager.csent) ) then return end
+        if ( skill_manager.csent:Hidden() ) then return end
+        halo.Add( { skill_manager.csent }, skill_manager.HaloColor(), 3, 3, 1, false, true)
+    end
 
-    return false
-end
+    function skill_manager.HaloPlayer()
+        if ( !IsValid(skill_manager.ccply) ) then return end
+        halo.Add( { skill_manager.ccply }, skill_manager.HaloColor(), 3, 3, 1, false, true)
+    end
 
-function skill_manager.CleverLockPlayer( pressing, trace, range, lock )
-    lock = lock or 0.95
+    local function checkRange( pos, rangeSqr )
+        return (pos - LocalPlayer():GetPos()):LengthSqr() <= rangeSqr
+    end
 
-    local dir = trace.Normal
-    local players = ents.FindInSphere(LocalPlayer():GetPos(), range)
-    local pos = LocalPlayer():GetPos()
-
-    local closestPlayer
-    local closestDot = 0
-
-    for k, ply in next, players do
-        if (!ply:IsPlayer()) then continue end
-        if (ply == LocalPlayer()) then continue end
-
-        local plyDir = (ply:GetPos() - pos):GetNormalized()
-        local plyDot = plyDir:Dot( dir )
-
-        if plyDot > lock and plyDot > closestDot then
-            closestPlayer = ply
-            closestDot = plyDot
+    local function checkTeam(ply, friendly)
+        local teamLocal = LocalPlayer():Team()
+        local teamPly = ply:Team()
+        if friendly then
+            return teamPly == teamLocal
         end
+        return teamPly != teamLocal
     end
 
-    if (closestPlayer and !pressing) then
-        skill_manager.ccply = nil
-        return { target = closestPlayer }
+    function skill_manager.CleverCastPlayer( pressing, trace, rangeSqr, friendly )
+        if (!checkRange(trace.HitPos, rangeSqr) or !trace.Entity or !trace.Entity:IsPlayer() or !checkTeam(trace.Entity, friendly)) then
+            skill_manager.ccply = nil
+            return false
+        end
+
+        if (!pressing) then
+            skill_manager.ccply = nil
+        else
+            skill_manager.ccply = trace.Entity
+        end
+
+        return true, { target = trace.Entity }
     end
 
-    skill_manager.ccply = closestPlayer
-    return false
-end
+    local function getClosestPlayer(dir, rangeSqr, friendly, lock)
+        local closestPlayer
+        local closestDot = 0
+        local pos = LocalPlayer():GetPos()
 
-function skill_manager.CleverCastWorld( pressing, trace )
-    if (!trace.HitWorld or trace.HitSky) then
-        skill_manager.csent:Hide()
-        return false
+        for k, ply in next, player.GetAll() do
+            if (ply == LocalPlayer()) then continue end
+            if (!checkTeam(ply, friendly)) then continue end
+
+            local plyDir = ply:GetPos() - pos
+            if (plyDir:LengthSqr() > rangeSqr) then continue end
+            if (ply == LocalPlayer()) then continue end
+
+            plyDir:Normalize()
+            local plyDot = plyDir:Dot( dir )
+
+            if plyDot > lock and plyDot > closestDot then
+                closestPlayer = ply
+                closestDot = plyDot
+            end
+        end
+
+        return closestPlayer
     end
 
-    local ang = trace.HitNormal:Angle()
-    ang:RotateAroundAxis(ang:Right(), -90)
+    function skill_manager.CleverLockPlayer( pressing, trace, rangeSqr, friendly, lock )
+        lock = lock or 0.95
 
-    if (!pressing) then
-        skill_manager.csent:Hide()
-        return { pos = trace.HitPos, dir = trace.HitNormal, ang = ang }
+        local closestPlayer
+        if trace.Entity and trace.Entity:IsPlayer() and checkTeam(trace.Entity, friendly) then
+            closestPlayer = trace.Entity
+        else
+            closestPlayer = getClosestPlayer( trace.Normal, rangeSqr, friendly, lock )
+        end
+
+        if (!closestPlayer) then
+            skill_manager.ccply = nil
+            return false
+        end
+
+        if (!pressing) then
+            skill_manager.ccply = nil
+        else
+            skill_manager.ccply = closestPlayer
+        end
+        return true, { target = closestPlayer }
     end
 
-    if skill_manager.csent:Hidden() then skill_manager.csent:Show() end
-    skill_manager.csent:SetPos( trace.HitPos )
-    skill_manager.csent:SetAngles( ang )
+    function skill_manager.CleverCastWorld( pressing, trace, rangeSqr )
+        if (trace.Entity and trace.Entity:IsPlayer()) then
+            trace = util.TraceLine({
+                start = trace.Entity:GetPos() + _VECTOR.UP * 20,
+                endpos = trace.Entity:GetPos() - _VECTOR.UP * 100,
+                collisiongroup = COLLISION_GROUP_WORLD
+            })
+        end
 
-    return false
+        if (!checkRange(trace.HitPos, rangeSqr) or !trace.HitWorld or trace.HitSky) then
+            skill_manager.csent:Hide()
+            return false
+        end
+
+        if (!pressing) then
+            skill_manager.csent:Hide()
+        elseif skill_manager.csent:Hidden() then
+            skill_manager.csent:Show()
+        end
+
+        local ang = trace.HitNormal:Angle()
+        ang:RotateAroundAxis(ang:Right(), -90)
+        skill_manager.csent:SetPos( trace.HitPos )
+        skill_manager.csent:SetAngles( ang )
+
+        return true, { pos = trace.HitPos, dir = trace.HitNormal, ang = ang }
+    end
 end
 
 _G.skill_manager = skill_manager

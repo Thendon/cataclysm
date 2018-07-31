@@ -4,15 +4,17 @@ local keyStrings = {}
 keyStrings[KEY_Q] = "Q"
 keyStrings[KEY_E] = "E"
 keyStrings[KEY_R] = "R"
+keyStrings[KEY_LSHIFT] = "Shift"
 keyStrings[MOUSE_LEFT] = "Left"
 keyStrings[MOUSE_RIGHT] = "Right"
 
 local keyMaterials = {}
-keyMaterials[KEY_Q] = Material("element/skills/Q.png")
-keyMaterials[KEY_E] = Material("element/skills/E.png")
-keyMaterials[KEY_R] = Material("element/skills/R.png")
-keyMaterials[MOUSE_LEFT] = Material("element/skills/Left.png")
-keyMaterials[MOUSE_RIGHT] = Material("element/skills/Right.png")
+keyMaterials[KEY_Q] = Material("element/keys/q.png")
+keyMaterials[KEY_E] = Material("element/keys/e.png")
+keyMaterials[KEY_R] = Material("element/keys/r.png")
+keyMaterials[KEY_LSHIFT] = Material("element/keys/shift.png")
+keyMaterials[MOUSE_LEFT] = Material("element/keys/left.png")
+keyMaterials[MOUSE_RIGHT] = Material("element/keys/right.png")
 
 local skillw, skillh = 128, 128
 
@@ -33,7 +35,7 @@ function UI.Init()
     i = i + 1
     UI.CreateSkill(KEY_E, skillo * i, 0)
     i = i + 1
-    UI.CreateSkill(KEY_R, skillo * i, 0)
+    UI.CreateSkill(KEY_LSHIFT, skillo * i, 0)
     i = 2
     UI.CreateSkill(MOUSE_RIGHT, scrw - skillo * i, 0)
     i = i + 1
@@ -43,22 +45,32 @@ function UI.Init()
 end
 
 local function UpdateSkill( panel )
+    if LocalPlayer():IsSpectator() then
+        panel:SetAlpha(0)
+        return
+    end
+
     local key = panel:GetKey()
-    if (LocalPlayer().skills[key].icon != panel:GetMaterial()) then
-        panel:SetMaterial( LocalPlayer().skills[key].icon )
+    local icon = skill_manager.GetSkill(LocalPlayer().skills[key]).icon
+    panel:SetAlpha(255)
+
+    if (icon != panel:GetMaterial()) then
+        panel:SetMaterial( icon )
     end
     panel:SetCooldown( LocalPlayer():GetCooldown( key ) )
 end
 
 function UI.CreateSkill(key, x, y)
-    local skill = TDLib("DSkill", UI.skillBar)
-    skill:SetKey( key )
-    skill:SetMaterial( LocalPlayer().skills[key].icon )
+    --local skill = skill_manager.GetSkill(LocalPlayer().skills[key])
+
+    local panel = TDLib("DSkill", UI.skillBar)
+    panel:SetKey( key )
+    --panel:SetMaterial( skill.icon )
     --skill:SetText( keyStrings[key] )
-    skill:SetMaterial2( keyMaterials[key] )
-    skill:SetPos( x, y )
-    skill:SetSize( skillw, skillh )
-    skill.Think = UpdateSkill
+    panel:SetMaterial2( keyMaterials[key] )
+    panel:SetPos( x, y )
+    panel:SetSize( skillw, skillh )
+    panel.Think = UpdateSkill
 end
 
 hook.Add("FinishedLoading", "UIInit", UI.Init)

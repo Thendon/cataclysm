@@ -49,6 +49,8 @@ if SERVER then
         velocity = velocity:GetNormalized() * power
         velocity.z = touched:OnGround() and 250 or 50
         touched:ReachVelocity( velocity )
+
+        self:Hit(ent, touched)
     end
 end
 

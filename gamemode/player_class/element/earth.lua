@@ -3,14 +3,22 @@ DEFINE_BASECLASS( "player_element" )
 local player = {}
 
 player.WalkSpeed = 200
-player.RunSpeed = 400
 player.Icon = Material("element/classes/earth.png", "unlitgeneric")
 player.Color = _COLOR.BROWN
+player.Sound = "taikos0"
+player.Track = "heavy"
+
 player.skills = {}
-player.skills[KEY_Q] = skill_manager.GetSkill("earth_bust")
-player.skills[KEY_E] = skill_manager.GetSkill("earth_push")
-player.skills[KEY_R] = skill_manager.GetSkill("earth_wall")
-player.skills[MOUSE_LEFT] = skill_manager.GetSkill("earth_blast")
-player.skills[MOUSE_RIGHT] = skill_manager.GetSkill("earth_boost")
+player.skills[KEY_Q] = "earth_bust"
+player.skills[KEY_E] = "earth_wall"
+player.skills[KEY_LSHIFT] = "earth_boost"
+player.skills[MOUSE_LEFT] = "earth_blast"
+player.skills[MOUSE_RIGHT] = "earth_push"
+
+if SERVER then resource.AddWorkshop( 1359912576 ) end
+
+player.models = {}
+table.insert(player.models, {model = "models/gonzo/femalejedi/master/master.mdl"})
+table.insert(player.models, {model = "models/gonzo/femalejedi/padawan/padawan.mdl", details = {body = { id = 1, value = 1 }}})
 
 player_manager.RegisterClass("player_earth", player, "player_element")

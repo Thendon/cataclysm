@@ -31,8 +31,13 @@ AnimationManager.Add( "handcuffed", anim )
 seqs = {}
 anim = {}
 
+local hits = {"hit0", "hit1", "hit2", "hit3", "hit4", "hit5", "hit6"}
+local swings = {"swing1", "swing2", "swing4"}
+
 local id = 1798
-table.insert(seqs, Sequence( id, 0.05, 0, 1 ))
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
 table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
 table.insert(seqs, Sequence( id, 0.15, 1, 0.5 ))
 table.insert(seqs, Sequence( id, 10, 0.4, 0.4 ))
@@ -46,7 +51,9 @@ seqs = {}
 anim = {}
 
 local id = 1801
-table.insert(seqs, Sequence( id, 0.05, 0, 1 ))
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
 table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
 table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
 table.insert(seqs, Sequence( 1798, 0.05, 0, 0.4 ))
@@ -75,7 +82,9 @@ anim = {}
 
 local id = 2004
 local val = 1
-table.insert(seqs, Sequence( id, 0.15, 0, val ))
+local seq = Sequence( id, 0.15, 0, val )
+seq:SetSound(swings)
+table.insert(seqs, seq)
 table.insert(seqs, Sequence( id, 0.15, val, 0 ))
 
 anim = Animation( seqs, 1 )

@@ -17,7 +17,7 @@ function skill:Stage1( ent )
     caster:ReachVelocity(velocity)
 end
 
-function skill:CanBeActivated( caster )
+function skill:ActivationConditions( caster )
     return caster:WaterLevel() < 2
 end
 

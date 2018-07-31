@@ -23,7 +23,7 @@ function earth_boost:Stage2( ent )
     ent:SetPos( dest )
 end
 
-function earth_boost:CanBeActivated( caster )
+function earth_boost:ActivationConditions( caster )
     return caster:OnGround()
 end
 

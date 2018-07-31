@@ -4,7 +4,7 @@ skill:SetMaxLive( 1 )
 skill:SetCooldown( 0.5 )
 skill:SetDamageType( "air" )
 
-local power = 1000
+local power = 1500
 
 local particles = {
     "element_air_trail_move",
@@ -57,6 +57,8 @@ if SERVER then
         local velocity = ent:GetForward() * power
         if (ent:OnGround()) then velocity = velocity * 5 end
         touched:ReachVelocity( velocity )
+
+        self:Hit(ent, touched)
     end
 end
 

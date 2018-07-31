@@ -18,6 +18,10 @@ if CLIENT then
         ent:CreateParticleEffect("element_air_trail_fly", 1)
         ent:EmitSound("air_smooth")
     end
+
+    function skill:OnRemove( ent )
+        ent:StopSound("air_smooth")
+    end
 end
 
 if SERVER then

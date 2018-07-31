@@ -12,7 +12,6 @@ AccessorFunc( ENT, "collidePlayers", "CollideWithPlayers", FORCE_BOOL )
 AccessorFunc( ENT, "collideSkills", "CollideWithSkills", FORCE_BOOL )
 
 function ENT:Initialize()
-    self:DrawShadow( false )
     self:SetBirth( CurTime() )
     self.loaded = true
 end
@@ -151,8 +150,9 @@ function ENT:CalcCustomCollisions()
 end
 
 function ENT:RemoveOnDeath( target )
+    if !target then target = { self:GetCaster() } end
     if !istable(target) then target = { target } end
-    self.removeOnDeath = target or { self:GetCaster() }
+    self.removeOnDeath = target
 end
 
 function ENT:GetRemoveOnDeath()

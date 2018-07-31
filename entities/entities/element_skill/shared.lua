@@ -41,6 +41,8 @@ function ENT:SetupDataTables()
         self.touching = {}
         self.dots = {}
     end
+
+    self:DrawShadow( false )
 end
 
 function ENT:SetSkill( skill )
