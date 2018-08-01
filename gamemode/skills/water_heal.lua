@@ -1,14 +1,16 @@
 
 local skill = Skill( "water_heal" )
 skill:SetMaxLive( 10 )
-skill:SetCooldown( 1 )
+skill:SetCooldown( 0.5 )
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
 skill:SetRange( 1000 )
+skill:SetCleverFriendly( true )
 skill:SetDamageType( "water" )
+skill:SetCastUntilRelease( true )
 
-local rate = 0.5
-local amount = 5
+local rate = 0.1
+local amount = 1
 
 function skill:Stage1( ent )
     local caster = ent:GetCaster()
@@ -22,11 +24,11 @@ if CLIENT then
         caster:PlayAnimation("shoot_fire" .. math.random(1,2))
 
         local effect = ent:CreateParticleEffect("element_water_heal", 1)
+        effect:AddControlPoint( 1, ent:GetTarget(), PATTACH_ABSORIGIN_FOLLOW, 0, _VECTOR.UP * 50 )
+        ent:EmitSound("water_stream")
         --local effect = CreateParticleSystem( ent, "element_water_attack", PATTACH_ABSORIGIN )
         --effect:SetControlPoint(1, ent:GetTarget():GetPos() + _VECTOR.UP * 50)
         --effect:SetControlPointEntity(1, ent:GetTarget())
-        effect:AddControlPoint( 1, ent:GetTarget(), PATTACH_ABSORIGIN_FOLLOW, 0, _VECTOR.UP * 50 )
-        ent:EmitSound("water_stream")
     end
 
     function skill:OnRemove( ent )

@@ -4,6 +4,7 @@ skill:SetMaxLive( 5 )
 skill:SetCooldown( 1 )
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
+skill:SetCastOnRelease( false )
 
 local damage = 10
 local range = 1000
@@ -44,7 +45,6 @@ if SERVER then
 
     function skill:OnRemove( ent )
         self:Hit(ent, ent:GetTarget(), damage)
-        print(ent, ent:GetTarget(), damage)
     end
 end
 

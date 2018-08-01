@@ -31,7 +31,7 @@ function earth_blast:Transition1( ent )
     phys:AddVelocity(ent:GetCaster():GetAimVector() * 10000)
 end
 
-function earth_blast:CanBeActivated( caster )
+function earth_blast:ActivationConditions( caster )
     return caster:OnGround()
 end
 
@@ -49,6 +49,8 @@ if CLIENT then
         ParticleEffect("element_earth_summon2", caster:GetPos(), caster:GetAngles())
         ent:EmitSound("earth_summon")
         ent:CreateParticleEffect("element_earth_dirt", 1)
+        ent:DrawShadow(true)
+        if !IsMounted("cstrike") then ent:SetClientModel("models/props_wasteland/rockgranite02a.mdl") end --3a
     end
 end
 
@@ -61,6 +63,7 @@ if SERVER then
         ent:SetNW2Vector( "physPos", offset + _VECTOR.UP * 60 )
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
         ent:SetCustomCollisionCheck( true )
+        ent:DrawShadow(true)
         --ent:NoCollideWithCaster()
     end
 

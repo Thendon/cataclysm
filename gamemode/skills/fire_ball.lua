@@ -3,7 +3,7 @@ local skill = Skill( "fire_ball" )
 skill:SetStages({ end_up })
 skill:SetCastTime( 0.5 )
 skill:SetMaxLive( 10 )
-skill:SetCooldown( 1 )
+skill:SetCooldown( 10 )
 skill:SetDamageType( "fire" )
 
 local moveSpeed = 5000
@@ -43,7 +43,7 @@ function skill:Stage2( ent )
     physObj:SetVelocity(ent.velocity)
 end
 
-function skill:CanBeActivated( caster )
+function skill:ActivationConditions( caster )
     return caster:WaterLevel() < 2
 end
 

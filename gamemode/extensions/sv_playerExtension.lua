@@ -3,6 +3,7 @@ local player = FindMetaTable( "Player" )
 local speedEpsilon = 500
 local speedDamageFactor = 0.05
 local waitAfterPhysHit = 0.05
+local assumeHitInflictor = 10
 
 local fallsounds = {
     Sound("player/damage1.wav"),
@@ -85,7 +86,13 @@ function player:HitWorld( speed, direction )
     local dmg = DamageInfo()
     dmg:SetDamageType(DMG_GENERIC) --DMG_FALL
     dmg:SetAttacker(game.GetWorld())
-    dmg:SetInflictor(game.GetWorld())
+
+    local lastHit = self:LastHit()
+    if (lastHit and lastHit.time > self:LastDeath() and lastHit.time + assumeHitInflictor > CurTime()) then
+        dmg:SetInflictor(lastHit.inflictor)
+    else
+        dmg:SetInflictor(game.GetWorld())
+    end
     dmg:SetDamage(damage)
 
     self:TakeDamageInfo(dmg)
@@ -93,8 +100,9 @@ function player:HitWorld( speed, direction )
     local now = CurTime()
     self.nextFallSound = self.nextFallSound or now
     if damage > 5 and self.nextFallSound < now then
+        print("MAKE FALL SOUND")
         self.nextFallSound = now + 1
-        sound.Play(table.Random(fallsounds), self:GetPos(), 80, 100, 1)
+        sound.Play(table.Random(fallsounds), self:GetPos(), 80, {90, 110}, 1)
     end
 end
 
@@ -115,7 +123,8 @@ end]]
 function player:TakeSkillDamage( dmgInfo, dmgType )
     if self:IsSkillImmune() then return end
 
-    self:TakeDamageInfo(dmgInfo)
+    self:TakeDamageInfo( dmgInfo )
+    self:SetLastHit( dmgInfo )
     dmgType:Hit( self )
 end
 
@@ -129,6 +138,7 @@ function player:OnDeath( inflictor, attacker )
     sound.Play(table.Random(deathsounds), self:GetPos(), 80, 100, 1)
     skill_manager.PlayerDeath(self)
     self:ResetStatus()
+    self:SetLastDeath( CurTime() )
 end
 
 function player:ResetStatus()
@@ -165,7 +175,7 @@ end
 function player:IsSilenced()
     return self:HasStatus( STATUS.SILENCED )
 end
-
+--[[
 function player:SetCasting( time )
     self:SetStatusTime( STATUS.CASTING, time )
 end
@@ -173,7 +183,7 @@ end
 function player:IsCasting()
     return self:HasStatus( STATUS.CASTING )
 end
-
+]]
 function player:SetSkillImmune( time )
     self:SetStatusTime( STATUS.SKILLIMMUNE, time )
 end

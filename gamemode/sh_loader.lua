@@ -8,15 +8,15 @@ local fileBlacklist = {
     "db", "vvd", "phy", "vtf", "vtx", "txt", "ztmp"
 }
 
-local function processFolder( path, domain, handle )
+local function processFolder( path, domain, handle, foldername )
     local files, folders = file.Find( path .. "/*", domain )
     path = path .. "/"
     for _, filename in next, files do
-        handle( path, filename )
+        handle( path, filename, foldername )
     end
 
     for _, foldername in next, folders do
-        processFolder( path .. foldername, domain, handle )
+        processFolder( path .. foldername, domain, handle, foldername )
     end
 end
 
@@ -69,6 +69,27 @@ local function LoadFolder( path )
     print(" - " .. path .. ": Loaded " .. count .. " LUA-Files" )
 end
 
+local function LoadManagedMusic()
+    local countFiles = 0
+    local countTracks = 0
+    local tracks = {}
+
+    processFolder( "sound/element/music_managed", "THIRDPARTY", function( path, filename, foldername )
+        countFiles = countFiles + 1
+        if (!tracks[foldername]) then
+            tracks[foldername] = {}
+            countTracks = countTracks + 1
+        end
+        table.insert(tracks[foldername], filename)
+    end)
+
+    for name, files in next, tracks do
+        music_manager.Feed( name, files )
+    end
+
+    print(" - Loaded " .. countTracks .. " Managed Music Tracks containing " .. countFiles .. " Files" )
+end
+
 print("Cataclysm: Setting up Gamemode")
 print("# Requiring libraries")
 require("classes")
@@ -94,5 +115,6 @@ if CLIENT then
     require("tdlib")
     LoadFolder( GM.Name .. "/gamemode/vgui" )
     LoadFolder( GM.Name .. "/gamemode/animations" )
+    LoadManagedMusic()
 end
 print("\n\n")

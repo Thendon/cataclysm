@@ -8,7 +8,7 @@ skill:SetDamageType( "earth" )
 
 local silenceTime = 2
 
-function skill:CanBeActivated( caster )
+function skill:ActivationConditions( caster )
     return caster:OnGround()
 end
 

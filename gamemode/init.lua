@@ -5,13 +5,50 @@ AddCSLuaFile( "sh_loader.lua" )
 
 include( "shared.lua" )
 
+function GM:PlayerInitialSpawn( ply )
+    ply:SetTeam(team.BestAutoJoinTeam())
+end
+
+local classes = {
+    "fire", "water", "earth", "air"
+}
+
 function GM:PlayerSpawn( ply )
-    ply:SetTeam(math.random(1, 2))
-    player_manager.SetPlayerClass(ply, "player_" .. ply:GetClassPick())
+    --if !ply.team then ply:JoinTeam(TEAM_SPECTATOR) end
+
+    if ply:IsSpectator() then return end --TODO not implemented at all ^^
+
+    ply:UnSpectate()
+
+    local class = ply:GetClassPick() or classes[math.random(1,4)]
+
+    if !class then return end
+
+    local spawn = spawn_manager.GetPlayerSpawn( ply )
+
+    if spawn then
+        ply:SetPos( spawn.pos )
+        ply:SetAngles( spawn.ang )
+        ply:SetEyeAngles( spawn.ang )
+    end
+
+    player_manager.SetPlayerClass(ply, "player_" .. class)
     player_manager.RunClass(ply, "Spawn")
 end
 
-function GM.FinishedLoading( ply )
+function GM:PlayerDeathThink( ply )
+    if ( ply.NextSpawnTime && ply.NextSpawnTime > CurTime() ) then return end
+
+    ply:Spectate(OBS_MODE_ROAMING)
+
+    if !round_manager.CanRespawn() then return end
+
+    if ( ply:IsBot() || ply:KeyPressed( IN_ATTACK ) || ply:KeyPressed( IN_ATTACK2 ) || ply:KeyPressed( IN_JUMP ) ) then
+        ply:Spawn()
+    end
+end
+
+function GM:PlayerFinishedLoading( ply )
     ply:FinishedLoading()
 end
 
@@ -30,25 +67,15 @@ end
 function GM:PlayerDeathSound()
     return true
 end
---[[
-local lastThink = 0
-local deltaTime = 0
-_G.DeltaTime = function()
-    return deltaTime
-end
 
-function GM:Think()
-    local now = CurTime()
-    DeltaTime = now - lastThink
-    lastThink = now
-end
-]]
 function GM:DeathMessage( victim, inflictor, attacker )
-    netstream.Start(player.GetAll(), "DeathMessage", victim, attacker:GetName(), inflictor)
+    attacker = attacker:IsWorld() and "world" or attacker:GetName()
+    netstream.Start(player.GetAll(), "DeathMessage", victim, attacker, inflictor)
 end
 
 function GM:PlayerDeath( victim, inflictor, attacker )
     victim:OnDeath( inflictor, attacker )
+    victim.NextSpawnTime = CurTime() + 3
     self:DeathMessage(victim, inflictor, attacker)
 end
 
@@ -65,4 +92,6 @@ function GM:EntityTakeDamage( ent, dmg )
     if (dmg:GetInflictor().isskill) then return true end
 end
 
-netstream.Hook("GM:FinishedLoading", GM.FinishedLoading)
+netstream.Hook("GM:FinishedLoading", function(ply)
+    hook.Call("PlayerFinishedLoading", GAMEMODE, ply)
+end)

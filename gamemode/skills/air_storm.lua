@@ -37,7 +37,7 @@ function skill:Stage2( ent )
     ent:GetCustomCollider():SetFraction((ent.alive - stage2) * 0.25)
 end
 
-function skill:CanBeActivated( caster )
+function skill:ActivationConditions( caster )
     return caster:OnGround()
 end
 
@@ -62,7 +62,7 @@ if SERVER then
         ent:SetRemoveOnWorldTrace( true )
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( 0 )
-        ent:SetTouchCaster( true )
+        --ent:SetTouchCaster( true )
         ent:SetCustomCollider( Capsule( col ) )
         ent:SetCollideWithSkills( true )
     end

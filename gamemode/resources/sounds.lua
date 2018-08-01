@@ -337,3 +337,147 @@ sound.Add({
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
+
+//WATER
+path = "element/fx/misc/"
+prefix = ""
+
+name = "hit0"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit1"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit2"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit3"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit4"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit5"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "hit6"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "swing1"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "swing2"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "swing3"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "swing4"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_AUTO,
+	volume = 1,
+	level = 100,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "taikos0"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 60,
+	pitch = 100,
+	sound = path .. name .. format
+})
+
+name = "taikos1"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 60,
+	pitch = 100,
+	sound = path .. name .. format
+})
+
+name = "taikos2"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_ITEM,
+	volume = 1,
+	level = 60,
+	pitch = 100,
+	sound = path .. name .. format
+})

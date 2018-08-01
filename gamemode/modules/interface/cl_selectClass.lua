@@ -4,6 +4,7 @@ function classMenu:Toggle()
     if (IsValid(self.derma)) then
         self:Close()
     else
+        if (cataUI.IsActive()) then return end
         self:Open()
     end
 end

@@ -30,7 +30,7 @@ function earth_wall:Stage3( ent )
     ent:SetPos( dest )
 end
 
-function earth_wall:CanBeActivated( caster )
+function earth_wall:ActivationConditions( caster )
     return caster:OnGround()
 end
 
