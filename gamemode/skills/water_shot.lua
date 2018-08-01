@@ -37,6 +37,7 @@ if SERVER then
         ent:SetInvisible( true )
         ent:RemoveOnDeath( cleverData.target )
         ent:SetTarget( cleverData.target )
+        ent:SetPos( caster:GetPos() + _VECTOR.UP * 50 + caster:GetForward() * 80 )
 
         local livetime = (cleverData.target:GetPos() - caster:GetPos()):Length()
         livetime = 0.5 + livetime * ( 1 / range )

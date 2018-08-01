@@ -1,5 +1,6 @@
 local player = {}
 local keyWasDown = {}
+local spawnProtection = 2
 
 function player:Init()
     self.Player.skills = self.skills
@@ -19,10 +20,18 @@ function player:Init()
     if CLIENT and self.Player:Team() == LocalPlayer():Team() then
         sound.Play(self.Sound, self.Player:GetPos())
     end
+
+    if SERVER then
+        self.Player:SetMaxHealth( self.Health )
+    end
 end
 
 function player:Spawn()
     self.Player:ResetCooldowns()
+
+    self.Player:SetHealth(self.Player:GetMaxHealth())
+    self.Player:SetSkillImmune(spawnProtection)
+    self.Player:SetFallImmune(spawnProtection)
 end
 
 function player:SetRandomClassModel()
@@ -117,8 +126,10 @@ if CLIENT then
         if (cataUI.IsActive()) then return end
         if (HandleLeftMouse()) then return end
         if (IsValid( vgui.GetHoveredPanel() )) then return end
+        if (self.Player:IsTyping()) then return end
 
         self:SkillInputs( cmd )
+
         --do static skills here
     end
 end

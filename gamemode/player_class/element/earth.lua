@@ -7,6 +7,7 @@ player.Icon = Material("element/classes/earth.png", "unlitgeneric")
 player.Color = _COLOR.BROWN
 player.Sound = "taikos0"
 player.Track = "heavy"
+player.Health = 300
 
 player.skills = {}
 player.skills[KEY_Q] = "earth_bust"

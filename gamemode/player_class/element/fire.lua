@@ -7,6 +7,7 @@ player.Icon = Material("element/classes/fire.png")
 player.Color = _COLOR.WHITE
 player.Sound = "taikos1"
 player.Track = "fast"
+player.Health = 200
 
 player.skills = {}
 player.skills[KEY_Q] = "fire_ball"

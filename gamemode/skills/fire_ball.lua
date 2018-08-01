@@ -63,6 +63,9 @@ if SERVER then
         ent:SetInvisible(true)
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
         ent:SetCustomCollisionCheck( true )
+        local forward = caster:GetRight():Cross(_VECTOR.UP)
+        ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() - forward * 30 )
+        ent:SetAngles( forward:Angle() )
     end
 
     function skill:PhysicsCollide( ent, data, phys )

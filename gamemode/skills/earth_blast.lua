@@ -64,7 +64,6 @@ if SERVER then
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
         ent:SetCustomCollisionCheck( true )
         ent:DrawShadow(true)
-        --ent:NoCollideWithCaster()
     end
 
     function earth_blast:PhysicsCollide( ent, data, phys )

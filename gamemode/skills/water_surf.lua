@@ -5,10 +5,16 @@ local duration = 3
 local start = 0.5
 skill:SetMaxLive( start + duration )
 skill:SetCooldown( 0.5 )
+skill:SetCastUntilRelease( true )
 skill:SetStages({ start })
+
+local speed = 1000
 
 local function posEnt( ent )
     local caster = ent:GetCaster()
+
+    if CLIENT and caster != LocalPlayer() then return end
+
     ent:SetPos( caster:GetPos() + Vector(0, 0, 20) )
     local forward = caster:GetForward()
     forward.z = 0
@@ -31,7 +37,22 @@ function skill:Stage2( ent )
 
     if CLIENT then return end
 
-    caster:ReachVelocity(caster:GetAimVector() * 1000)
+    if caster:OnGround() then
+        caster:SetMoveType(MOVETYPE_WALK)
+        caster:ReachVelocity(_VECTOR.UP * 500)
+        return
+    end
+
+    local tr = util.TraceLine({
+        start = caster:GetPos(),
+        endpos = caster:GetPos() - _VECTOR.UP * 50,
+        collisiongroup = COLLISION_GROUP_WORLD
+    })
+
+    if !tr.Hit then return end
+
+    caster:SetMoveType(MOVETYPE_FLYGRAVITY)
+    caster:ReachVelocity(caster:GetAimVector() * speed)
 end
 
 if CLIENT then
@@ -50,6 +71,11 @@ if SERVER then
     function skill:Spawn( ent, caster )
         ent:SetInvisible( true )
         ent:RemoveOnDeath()
+        posEnt( ent )
+    end
+
+    function skill:OnRemove( ent )
+        ent:GetCaster():SetMoveType(MOVETYPE_WALK)
     end
 end
 

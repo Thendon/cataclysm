@@ -33,7 +33,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
+        caster:PlayAnimation("shoot_air")
         sound.Play(sounds[math.random(1, 2)], caster:GetPos())
         ent:CreateParticleEffect(particles[math.random(1,2)], 1)
     end
@@ -48,6 +48,7 @@ if SERVER then
         ent:SetCustomCollider( Capsule( col ) )
         ent:SetCollideWithSkills( true )
         ent:RemoveOnDeath()
+        ent:SetPos(caster:GetPos() + _VECTOR.UP * 50)
 
         local ang = caster:GetAimVector():Angle()
         ent:SetAngles(ang)
@@ -55,7 +56,7 @@ if SERVER then
 
     function skill:Touch( ent, touched )
         local velocity = ent:GetForward() * power
-        if (ent:OnGround()) then velocity = velocity * 5 end
+        if touched:OnGround() then velocity.z = 250 end
         touched:ReachVelocity( velocity )
 
         self:Hit(ent, touched)

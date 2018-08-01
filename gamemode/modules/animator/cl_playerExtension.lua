@@ -12,6 +12,12 @@ function player:PlayAnimation( anim )
     self.anim = anim
 end
 
+function player:StopAnimation()
+    if !self:AnimationRunning() then return end
+
+    self.animState = self.anim:GetLastStateStart()
+end
+
 function player:AnimationRunning()
     return self.anim and true or false
 end

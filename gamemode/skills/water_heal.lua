@@ -26,9 +26,6 @@ if CLIENT then
         local effect = ent:CreateParticleEffect("element_water_heal", 1)
         effect:AddControlPoint( 1, ent:GetTarget(), PATTACH_ABSORIGIN_FOLLOW, 0, _VECTOR.UP * 50 )
         ent:EmitSound("water_stream")
-        --local effect = CreateParticleSystem( ent, "element_water_attack", PATTACH_ABSORIGIN )
-        --effect:SetControlPoint(1, ent:GetTarget():GetPos() + _VECTOR.UP * 50)
-        --effect:SetControlPointEntity(1, ent:GetTarget())
     end
 
     function skill:OnRemove( ent )
@@ -38,6 +35,7 @@ end
 
 if SERVER then
     function skill:Spawn( ent, caster, cleverData )
+        ent:SetPos( caster:GetPos() + _VECTOR.UP * 50 + caster:GetForward() * 80 )
         ent:SetInvisible( true )
         ent:RemoveOnDeath( { cleverData.target, caster } )
         ent:SetTarget( cleverData.target )

@@ -52,6 +52,27 @@ function player:SetLastHit( info )
     if SERVER then netstream.Start(self, "player:SetLastHit", self.lastHit) end
 end
 
+function player:SetKey( key, status )
+    self.keysPressed = self.keysPressed or {}
+
+    self.keysPressed[key] = status
+end
+
+function player:KeyPressed( key )
+    return self.keysPressed[key] or false
+end
+
+function player:GetMoveVector()
+    local direction = Vector()
+    if self:KeyPressed(IN_MOVERIGHT) then direction = direction + self:GetRight() end
+    if self:KeyPressed(IN_MOVELEFT) then direction = direction - self:GetRight() end
+    if self:KeyPressed(IN_FORWARD) then direction = direction + self:GetForward() end
+    if self:KeyPressed(IN_BACK) then direction = direction - self:GetForward() end
+
+    if direction:LengthSqr() < 0.1 then direction = _VECTOR.UP end
+    return direction:GetNormalized()
+end
+
 if CLIENT then
     netstream.Hook("player:SetLastDeath", function(time)
         LocalPlayer():SetLastDeath(time)

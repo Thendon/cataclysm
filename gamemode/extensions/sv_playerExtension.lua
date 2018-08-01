@@ -20,6 +20,31 @@ local deathsounds = {
     Sound("player/death6.wav")
 }
 
+local fallsounds = {
+    Sound("physics/body/body_medium_impact_hard1.wav"),
+    Sound("physics/body/body_medium_impact_hard2.wav"),
+    Sound("physics/body/body_medium_impact_hard3.wav"),
+    Sound("physics/body/body_medium_impact_hard4.wav"),
+    Sound("physics/body/body_medium_impact_hard5.wav"),
+    Sound("physics/body/body_medium_impact_hard6.wav"),
+}
+
+local fallsounds2 = {
+    Sound("physics/body/body_medium_impact_soft1.wav"),
+    Sound("physics/body/body_medium_impact_soft2.wav"),
+    Sound("physics/body/body_medium_impact_soft3.wav"),
+    Sound("physics/body/body_medium_impact_soft4.wav"),
+    Sound("physics/body/body_medium_impact_soft5.wav"),
+    Sound("physics/body/body_medium_impact_soft6.wav"),
+    Sound("physics/body/body_medium_impact_soft7.wav"),
+}
+
+local deathsounds = {
+    Sound("physics/body/body_medium_break2.wav"),
+    Sound("physics/body/body_medium_break3.wav"),
+    Sound("physics/body/body_medium_break4.wav"),
+}
+
 local STATUS = {}
 STATUS.SILENCED = 1
 STATUS.CASTING = 2
@@ -99,10 +124,10 @@ function player:HitWorld( speed, direction )
 
     local now = CurTime()
     self.nextFallSound = self.nextFallSound or now
-    if damage > 5 and self.nextFallSound < now then
-        print("MAKE FALL SOUND")
+    if self.nextFallSound < now then
         self.nextFallSound = now + 1
-        sound.Play(table.Random(fallsounds), self:GetPos(), 80, {90, 110}, 1)
+        fallsound = damage > 5 and table.Random(fallsounds) or table.Random(fallsounds2)
+        sound.Play(fallsound, self:GetPos(), 80, {90, 110}, 1)
     end
 end
 
@@ -123,6 +148,7 @@ end]]
 function player:TakeSkillDamage( dmgInfo, dmgType )
     if self:IsSkillImmune() then return end
 
+    self:UpdateLastPhysHit() --todo create something better
     self:TakeDamageInfo( dmgInfo )
     self:SetLastHit( dmgInfo )
     dmgType:Hit( self )

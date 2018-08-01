@@ -91,12 +91,18 @@ if CLIENT then
     function skill_manager.HaloCSEnt()
         if ( !IsValid(skill_manager.csent) ) then return end
         if ( skill_manager.csent:Hidden() ) then return end
-        halo.Add( { skill_manager.csent }, skill_manager.HaloColor(), 3, 3, 1, false, true)
+
+        local color = skill_manager.HaloColor()
+        local additive = color == _COLOR.WHITE
+        halo.Add( { skill_manager.csent }, color, 3, 3, 1, additive, true)
     end
 
     function skill_manager.HaloPlayer()
         if ( !IsValid(skill_manager.ccply) ) then return end
-        halo.Add( { skill_manager.ccply }, skill_manager.HaloColor(), 3, 3, 1, false, true)
+
+        local color = skill_manager.HaloColor()
+        local additive = color == _COLOR.WHITE
+        halo.Add( { skill_manager.ccply }, color, 3, 3, 1, additive, true)
     end
 
     local function checkRange( pos, rangeSqr )

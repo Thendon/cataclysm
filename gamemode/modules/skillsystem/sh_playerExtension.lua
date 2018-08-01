@@ -27,10 +27,7 @@ if CLIENT then
 
     function player:ApplyCooldown(skill, timestamp)
         self:SetCooldown(skill, timestamp - 0.1)
-
-        for k, cooldown in next, self.nextUse do
-            self.nextUse[k] = math.max(cooldown, CurTime() + globalCooldown - 0.1)
-        end
+        self:ApplyGlobalCooldown( timestamp - skill:GetCooldown(), 0.1 )
     end
 
     function player:ResetCooldowns( timestamp )
@@ -87,10 +84,7 @@ if SERVER then
 
     function player:ApplyCooldown( skill, time )
         self:SetCooldown( skill, CurTime() + time )
-
-        for k, cooldown in next, self.nextUse do
-            self.nextUse[k] = math.max(cooldown, CurTime() + globalCooldown)
-        end
+        self:ApplyGlobalCooldown()
 
         netstream.Start( self, "player:ApplyCooldown", skill:GetName(), self.nextUse[skill] )
     end
@@ -132,6 +126,8 @@ end
 function player:SetCooldown( skill, timestamp )
     self.nextUse = self.nextUse or {}
     self.nextUse[skill] = timestamp
+    self.cooldownTime = self.cooldownTime or {}
+    self.cooldownTime[skill] = timestamp - CurTime()
 end
 
 function player:CanActivateSkill( skill )
@@ -148,9 +144,19 @@ function player:SkillNextUse( skill )
     return self.nextUse[skill]
 end
 
+function player:GetCooldownLength( skill )
+    self.cooldownTime = self.cooldownTime or {}
+    self.cooldownTime[skill] = self.cooldownTime[skill] or 1
+
+    return self.cooldownTime[skill]
+end
+
 function player:GetCooldown( skill )
     if (isnumber(skill)) then skill = skill_manager.GetSkill(self.skills[skill]) end
-    return math.Clamp((self:SkillNextUse( skill ) - CurTime()) / skill.cooldown, 0, 1)
+    local nextUse = self:SkillNextUse( skill ) - CurTime()
+    local cooldown = self:GetCooldownLength( skill ) or skill.cooldown
+
+    return math.Clamp( nextUse / cooldown, 0, 1)
 end
 
 function player:HandSwitcher()
@@ -163,4 +169,16 @@ function player:GetCasting( skill )
     self.casting = self.casting or {}
 
     return self.casting[skill] or false
+end
+
+function player:ApplyGlobalCooldown( timestamp, epsilon )
+    timestamp = timestamp or CurTime()
+    epsilon = epsilon or 0
+
+    local global = timestamp + globalCooldown
+    for otherSkill, cooldown in next, self.nextUse do
+        if cooldown > global then continue end
+        self.nextUse[otherSkill] = global - epsilon
+        self.cooldownTime[otherSkill] = globalCooldown - epsilon
+    end
 end

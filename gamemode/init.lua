@@ -14,6 +14,7 @@ local classes = {
 }
 
 function GM:PlayerSpawn( ply )
+    skill_manager.PlayerDeath( ply )
     --if !ply.team then ply:JoinTeam(TEAM_SPECTATOR) end
 
     if ply:IsSpectator() then return end --TODO not implemented at all ^^
@@ -34,6 +35,14 @@ function GM:PlayerSpawn( ply )
 
     player_manager.SetPlayerClass(ply, "player_" .. class)
     player_manager.RunClass(ply, "Spawn")
+end
+
+function GM:KeyPress( ply, key )
+    ply:SetKey( key, true )
+end
+
+function GM:KeyRelease( ply, key )
+    ply:SetKey( key, false )
 end
 
 function GM:PlayerDeathThink( ply )
@@ -79,7 +88,6 @@ function GM:PlayerDeath( victim, inflictor, attacker )
     self:DeathMessage(victim, inflictor, attacker)
 end
 
---USING CONSTRAINT INSTEAD
 function GM:ShouldCollide(ent1, ent2)
     if (!ent1.isskill) then return end
     local ret = ent1:ShouldCollide( ent2 )
@@ -89,7 +97,7 @@ end
 
 function GM:EntityTakeDamage( ent, dmg )
     --TODO remove physics damage to player
-    if (dmg:GetInflictor().isskill) then return true end
+    if (dmg:GetInflictor().isskill) then print("stopped phys dmg") return true end
 end
 
 netstream.Hook("GM:FinishedLoading", function(ply)

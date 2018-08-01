@@ -34,3 +34,11 @@ function Animation:GetInfos( state )
     if (activeSequence == -1) then return activeSequence end
     return activeSequence:GetInfos( sequenceState, starting )
 end
+
+function Animation:GetLastStateStart()
+    local prevDuration = 0
+    for i = 1, table.Count(self.sequences) - 1 do
+        prevDuration = prevDuration + self.sequences[i].duration
+    end
+    return prevDuration
+end

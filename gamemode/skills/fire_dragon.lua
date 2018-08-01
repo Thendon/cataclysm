@@ -40,6 +40,8 @@ if SERVER then
         ent:SetTouchRate( rate )
         caster:Slow(1.4, 0.001)
         ent:SetCustomCollider( Capsule( col ) )
+        ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() )
+        ent:SetAngles( caster:GetAimVector():Angle() )
     end
 
     function skill:OnRemove( ent )

@@ -46,15 +46,12 @@ if SERVER then
         function ent:OnRemove()
             ParticleEffect("element_earth_explode", self:GetPos(), Angle())
         end
-        --ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
-        --ent:PhysWake()
 
-        local dir = caster:GetVelocity():GetNormalized()
+        local dir = caster:GetMoveVector() --caster:GetVelocity():GetNormalized()
         local dot = caster:GetAimVector():Dot(_VECTOR.UP)
         dir.z = math.Clamp(dot, 0.5, 1)
         caster:SetVelocity( dir * 750 )
         caster:SetFallDamper(30, 0.5, 2)
-        --caster:SetFallImmune( 30 )
     end
 end
 

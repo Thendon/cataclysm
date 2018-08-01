@@ -1,10 +1,19 @@
+
+
+local hits = {"hit0", "hit1", "hit2", "hit3", "hit4", "hit5", "hit6"}
+local swings = {"swing1", "swing2", "swing4"}
+
 local seqs = {}
 local anim = {}
 
-table.insert(seqs, Sequence( 1801, 0.05, 0, 1 ))
+local seq = Sequence( 1801, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
 table.insert(seqs, Sequence( 1801, 0.1, 1, 1 ))
 table.insert(seqs, Sequence( 1801, 0.2, 1, 0 ))
-table.insert(seqs, Sequence( 1797, 0.02, 0, 1 ))
+local seq = Sequence( 1797, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
 table.insert(seqs, Sequence( 1797, 0.1, 1, 1 ))
 table.insert(seqs, Sequence( 1797, 0.1, 1, 0 ))
 table.insert(seqs, Sequence( 1, 1, 0, 0 ))
@@ -30,9 +39,6 @@ AnimationManager.Add( "handcuffed", anim )
 
 seqs = {}
 anim = {}
-
-local hits = {"hit0", "hit1", "hit2", "hit3", "hit4", "hit5", "hit6"}
-local swings = {"swing1", "swing2", "swing4"}
 
 local id = 1798
 local seq = Sequence( id, 0.05, 0, 1 )
@@ -103,3 +109,68 @@ table.insert(seqs, Sequence( id, 0.25, val, 0 ))
 anim = Animation( seqs, 1 )
 
 AnimationManager.Add( "dragon", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1660
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "shoot_air", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1652
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1657
+local seq = Sequence( id, 0.15, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "summon_air", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1652
+local seq = Sequence( id, 0.15, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1657
+local seq = Sequence( id, 0.15, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "summon_air2", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1651
+local val = 0.8
+table.insert(seqs, Sequence( id, 0.5, 0, val ))
+table.insert(seqs, Sequence( id, 10, val, val ))
+table.insert(seqs, Sequence( id, 0.5, val, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "fly", anim )

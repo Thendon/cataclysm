@@ -1,7 +1,7 @@
 _G.spawn_manager = spawn_manager or {}
 
 spawn_manager.spawnPoints = spawn_manager.spawnPoints or {}
-spawn_manager.swapperIndex = spawn_manager.swapperIndex or 0 --todo check if working
+spawn_manager.swapperIndex = spawn_manager.swapperIndex or 1
 spawn_manager.teamSpawnPoints = spawn_manager.teamSpawnPoints or {}
 spawn_manager.usedSpawnPoints = spawn_manager.usedSpawnPoints or {}
 

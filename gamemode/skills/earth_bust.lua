@@ -16,9 +16,10 @@ if CLIENT then
     function skill:Activate( ent, caster )
         caster:PlayAnimation("shoot_stone")
         ent:GetTarget():PlayAnimation("handcuffed")
-        ent:CreateParticleEffect("element_earth_hit", 1)
+        ent:CreateParticleEffect("element_earth_gather", 1)
         ParticleEffect("element_earth_summon", caster:GetPos(), Angle())
         ent:EmitSound("earth_gather")
+        if !IsMounted("cstrike") then ent:SetClientModel("models/props_wasteland/rockgranite03b.mdl") end
     end
 
     function skill:OnRemove( ent )
@@ -37,7 +38,6 @@ if SERVER then
         ent:SetPos( attachment.Pos - attachment.Ang:Up() * 9 + attachment.Ang:Right() * 5 + attachment.Ang:Forward() * 2)
         ent:SetAngles( attachment.Ang )
         ent:SetParent( cleverData.target, attachmentID )
-        --ent:SetMoveType( MOVETYPE_NONE )
         ent:SetTarget(cleverData.target)
         ent:RemoveOnDeath(cleverData.target)
 

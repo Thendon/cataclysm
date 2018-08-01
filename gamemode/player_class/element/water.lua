@@ -7,6 +7,7 @@ player.Icon = Material("element/classes/water.png", "unlitgeneric")
 player.Color = _COLOR.BLUE
 player.Sound = "taikos1"
 player.Track = "fast"
+player.Health = 200
 
 player.skills = {}
 player.skills[KEY_Q] = "water_drown"

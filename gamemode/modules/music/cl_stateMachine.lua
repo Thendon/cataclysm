@@ -69,6 +69,10 @@ end
 
 local function BufferTrack()
     local track = music_manager.GetTrack(trackname)
+    if !track then
+        music_machine.state = MUSIC_STATES.OVER
+        return
+    end
 
     music_machine.state = MUSIC_STATES.LOADING
     music_machine.trackPlaying = trackname
@@ -120,6 +124,9 @@ function music_machine.SetFraction( fraction )
 end
 
 local function GetTransition( sequence )
+    sequence = sequence or music_machine.sequence
+    if !sequence then return false end
+
     for k, seq in next, music_machine.sequences do
         if !seq.transition then continue end
         if seq.transition != sequence.state then continue end

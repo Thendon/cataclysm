@@ -74,9 +74,9 @@ end
 if SERVER then
     function skill:Spawn( ent, caster, cleverData )
         ent:SetInvisible( true )
-        ent:SetPos( cleverData.target:GetPos() + _VECTOR.UP * 50 )
-        ent:SetParent( cleverData.target, 0 )
         local pos = cleverData.target:GetPos()
+        ent:SetPos( pos + _VECTOR.UP * 50 )
+        ent:SetParent( cleverData.target, 0 )
         --ent:SetNW2Entity("target", cleverData.target)
         ent:SetTarget(cleverData.target)
         ent:SetNW2Vector("startPos", pos)

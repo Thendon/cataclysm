@@ -4,7 +4,7 @@ local rate = 0.5
 
 local stage2 = immune - 2
 skill:SetMaxLive( immune )
-skill:SetCooldown( 0.5 )
+skill:SetCooldown( 10 )
 skill:SetStages( { stage2 } )
 
  --todo make sphere collider
@@ -13,6 +13,11 @@ local col = Capsule(Vector(), Vector(), 100)
 
 function skill:Stage1( ent )
     ent:SetPos( ent:GetCaster():GetPos() + _VECTOR.UP * 50 )
+
+    if SERVER then return end
+
+    local caster = ent:GetCaster()
+    if !caster:AnimationRunning() then caster:PlayAnimation("summon_air2") end
 end
 
 function skill:Transition1( ent )
@@ -26,7 +31,6 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
         ent:EmitSound("air_storm2")
         ent:CreateParticleEffect("element_air_shield", 1)
         --ent:SetCustomCollider( Capsule( col ) )
@@ -47,6 +51,7 @@ if SERVER then
         ent:SetCollideWithPlayers( false )
         ent:SetCollideWithSkills( true )
         ent:RemoveOnDeath()
+        ent:SetPos( caster:GetPos() + _VECTOR.UP * 50 )
 
         caster:SetSkillImmune( immune )
         caster:SetFallImmune( immune )

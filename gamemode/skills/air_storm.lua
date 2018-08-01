@@ -1,6 +1,8 @@
 local skill = Skill( "air_storm" )
 skill:SetMaxLive( 13 )
-skill:SetCooldown( 0.5 )
+skill:SetCleverCast( true )
+skill:SetRange( 500 )
+skill:SetCooldown( 15 )
 skill:SetDamageType( "air" )
 
 local stage2 = 10
@@ -8,15 +10,21 @@ skill:SetStages( { stage2 } )
 
 local radius = 170
 local power = 1
-local rate = 0.1
 
 local col = Capsule(Vector(), Vector(), radius)
 col:SetPos1Dest(Vector(0,0,0))
 col:SetPos2Dest(Vector(0,0,600))
 
 function skill:Stage1( ent )
-    if CLIENT then return end
-    ent:GetCustomCollider():SetFraction(ent.alive * 0.25)
+    if SERVER then
+        ent:GetCustomCollider():SetFraction(ent.alive * 0.25)
+        return
+    end
+
+    if ent.alive > 1 then return end
+    local caster = ent:GetCaster()
+    if caster:AnimationRunning() then return end
+    caster:PlayAnimation("summon_air2")
 end
 
 function skill:Transition1( ent )
@@ -43,8 +51,8 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
         ent:EmitSound("air_storm")
+        CreateParticleSystem( caster, "element_air_trail_move", PATTACH_ABSORIGIN )
         ent:CreateParticleEffect("element_air_storm", 1)
         --ent:SetCustomCollider( Capsule( col ) )
     end
@@ -55,14 +63,14 @@ if CLIENT then
 end
 
 if SERVER then
-    function skill:Spawn( ent, caster )
-        ent:SetPos( caster:GetPos() )
+    function skill:Spawn( ent, caster, cleverData )
+        ent:SetPos( cleverData.pos )
 
         ent:SetInvisible( true )
         ent:SetRemoveOnWorldTrace( true )
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( 0 )
-        --ent:SetTouchCaster( true )
+        ent:SetTouchCaster( true )
         ent:SetCustomCollider( Capsule( col ) )
         ent:SetCollideWithSkills( true )
     end

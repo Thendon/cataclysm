@@ -1,7 +1,7 @@
 
 local skill = Skill( "air_move" )
 skill:SetMaxLive( 2 )
-skill:SetCooldown( 0.5 )
+skill:SetCooldown( 3 )
 skill:SetDamageType( "air" )
 
 local power = 1000
@@ -23,7 +23,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
+        caster:PlayAnimation("summon_air")
         ent:CreateParticleEffect("element_air_trail_remove", 1)
         ent:EmitSound("air_move")
     end
@@ -45,7 +45,8 @@ if SERVER then
     end
 
     function skill:Touch( ent, touched )
-        local velocity = ent:GetCustomCollider():GetDirectionTo( touched )
+        local direction = ent:GetCustomCollider():GetDirectionTo( touched )
+        local velocity = ent:WorldToLocal(direction + ent:GetPos())
         velocity = velocity:GetNormalized() * power
         velocity.z = touched:OnGround() and 250 or 50
         touched:ReachVelocity( velocity )

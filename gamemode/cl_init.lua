@@ -20,6 +20,13 @@ _G.PlayBGS = function( file )
     end)
 end
 
+_G.PlayBGL = function( ent, name )
+    local s = CreateSound( ent, name )
+    s:Play()
+    s:ChangeVolume(0)
+    return s
+end
+
 function GM:FinishedLoading()
     netstream.Start("GM:FinishedLoading")
     skill_manager.Initialize()

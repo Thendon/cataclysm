@@ -4,7 +4,7 @@
 
 --true false (for cpy paste lol i m lazy k)
 
-local camDistance = 1500
+local camDistance = 100
 local camRotation = false
 
 local animationFinder = false --Scroll through usable acts
