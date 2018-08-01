@@ -111,6 +111,7 @@ function ENT:NoCollideWithCaster()
 end
 ]]
 
+--todo this in collider
 function ENT:CheckWorldTrace()
     local tr = util.TraceLine({
         start = self:GetPos(),
