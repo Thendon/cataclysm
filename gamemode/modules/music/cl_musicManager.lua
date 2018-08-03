@@ -2,6 +2,8 @@ _G.music_manager = music_manager or {}
 
 local tracks = {}
 
+local tensionTime = 10
+
 local function analyseFile( trackname, file )
     local sequence = {}
 
@@ -51,11 +53,9 @@ function music_manager.ChangeTrack( trackname )
 end
 
 function music_manager.UpdateHealthFracion()
-    --local fraction = math.abs(math.sin(CurTime() * 0.1))
     local health = LocalPlayer():Health() / LocalPlayer():GetMaxHealth()
     local fraction = math.Clamp(1 - health, 0, 1)
     music_machine.SetFraction(fraction)
-    --if (fraction > 0 and fraction < 1) and !music_machine.IsPlaying() then print("start track") music_machine.StartTrack() end
 end
 
 function music_manager.SetTrackStatus( status )
@@ -70,34 +70,58 @@ function music_manager.SetTrackStatus( status )
     end
 end
 
-function music_manager.StartTrack()
-    local playing = music_machine.IsPlaying()
+function music_manager.EndTrack()
+    music_manager.SetTrackStatus( false )
 end
 
-local tensionTime = 30
+function music_manager.StartTrack()
+    music_manager.SetTrackStatus( true )
+end
 
-function music_manager.ControlPlaying()
-    if round_manager.GetRoundState() != ROUND_STATE.ACTIVE then
-        --music_manager.SetTrackStatus( false )
-        --return
-    end
-
+local function HandleLastHit()
     local lastHit = LocalPlayer():LastHit()
-    if !lastHit then return end
+
+    if !lastHit then return false end
 
     if lastHit.time <= LocalPlayer():LastDeath() then
-        music_manager.SetTrackStatus( false )
-        return
+        return false
     end
 
     if lastHit.time + tensionTime < CurTime() then
+        return false
+    end
+
+    return true
+end
+
+local function HandleLastLandedHit()
+    local lastLanded = LocalPlayer():LastLandedHit()
+
+    if !lastLanded then return false end
+
+    if lastLanded.time <= LocalPlayer():LastDeath() then
+        return false
+    end
+
+    if lastLanded.time + tensionTime < CurTime() then
+        return false
+    end
+
+    return true
+end
+
+function music_manager.ControlPlaying()
+    if round_manager.GetRoundState() != ROUND_STATE.ACTIVE then
         music_manager.SetTrackStatus( false )
         return
     end
 
-    if lastHit.inflictor:IsPlayer() then
-        music_manager.SetTrackStatus( true )
+    if !HandleLastHit() and !HandleLastLandedHit() then
+        music_manager.SetTrackStatus( false )
+        return
     end
+
+    music_manager.SetTrackStatus( true )
 end
 
 function music_manager.Update()

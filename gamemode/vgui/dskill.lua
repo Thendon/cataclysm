@@ -5,15 +5,23 @@ AccessorFunc( PANEL, "key", "Key" )
 function PANEL:Init()
     self.icon = TDLib("DImage", self)
     self.icon:SetPos( 0,0 )
+    self.icon.fraction = 0
+    self.icon.Paint = function( pnl )
+        local w, h = pnl:GetSize()
+        local f = 1 - pnl.fraction
+        local o = f * h
+
+        surface.SetMaterial( pnl:GetMaterial() )
+        if f == 1 then
+            surface.SetDrawColor( _COLOR.FULL )
+        else
+            surface.SetDrawColor( _COLOR.WHITEFADE )
+        end
+        surface.DrawTexturedRectUV( 0, h - o, w, o, 0, 1 - f, 1, 1)
+    end
 
     self.keyImage = TDLib("DImage", self)
     self.keyImage:SetPos( 0,0 )
-
-    --[[self.loading = TDLib("DImage", self)
-    self.loading:SetPos( 0,0 )
-    --self.loading:SetBackgroundColor(_COLOR.FADE)
-    --mat_Add:SetTexture("$basetexture", )
-    self.loading:SetMaterial(mat_Add)]]
 
     self.label = TDLib("DLabel", self)
     self.label:SetPos( 0,0 )
@@ -33,12 +41,10 @@ function PANEL:PerformLayout(w, h)
     self.label:SetPos(w * 0.5 - wOffset, h * 0.1 + hOffset)
 end
 
-function PANEL:SetCooldown( level )
-    level = 1 - level
-    self:SetAlpha( level * level * 255 )
-
-    --local _, h = self.loading:GetSize()
-    --self.loading:SetPos(0, -h * (1 - level))
+function PANEL:SetCooldown( fraction )
+    --level = 1 - level
+    --self:SetAlpha( level * level * 255 )
+    self.icon.fraction = fraction
 end
 
 function PANEL:Flash( level )

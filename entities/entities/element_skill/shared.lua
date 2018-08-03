@@ -15,7 +15,7 @@ end
 function ENT:SetupDataTables()
     self.skill = nil --{}
     self.lastThink = CurTime()
-    self.alive = 0 --maybe send alive scince
+    self.alive = 0 --Use Timestamp instead TODO
     self.stage = 1
     self:SetMaxLive( 60 )
     --immediately networked & reliable but no proxy

@@ -1,4 +1,5 @@
 local skill = Skill( "air_storm" )
+skill:SetDescription("Summon a storm at the position you are looking at.")
 skill:SetMaxLive( 13 )
 skill:SetCleverCast( true )
 skill:SetRange( 500 )

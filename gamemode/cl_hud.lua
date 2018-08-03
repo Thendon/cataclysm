@@ -1,4 +1,9 @@
 local hpLerpSpeed = 0.4
+local distStartFade = 800
+local distEndFade = 1000
+
+distStartFade = distStartFade * distStartFade
+local distEndFadeFactor = 1 / (distEndFade * distEndFade - distStartFade)
 
 local function CalcHealthFactor( ply )
     ply.lastHealthFactor = ply.lastHealthFactor or 1
@@ -8,21 +13,34 @@ local function CalcHealthFactor( ply )
     return ply.lastHealthFactor
 end
 
-local function DrawPlayerInfos(x,y,w,h, ply, color)
+local function DrawPlayerInfos(x,y,w,h, ply, color, distance)
+    local health = _COLOR.RED
+
+    if distance then
+        local alpha = distance - distStartFade
+        if alpha > 0 then
+            alpha = 255 - ((alpha * distEndFadeFactor) * 255)
+            color = Color( color.r, color.g, color.b, alpha )
+            health = Color( _COLOR.RED.r, _COLOR.RED.g, _COLOR.RED.b, alpha )
+        end
+    end
+
     surface.SetDrawColor( color )
     surface.DrawRect(x, y - h * 0.2, w, h + h * 0.4)
 
     local width = math.floor(w * (1 - CalcHealthFactor(ply)))
-    surface.SetDrawColor( _COLOR.RED )
+    surface.SetDrawColor( health )
     surface.DrawRect(x + w - width,y, width,h)
+    surface.SetDrawColor( health )
+    surface.DrawRect(x - 2, y - h * 0.2, 2, h + h * 0.4)
 end
 
-function GM:DrawPlayerHealthbar(ply)
+function GM:DrawPlayerHealthbar(ply, distance)
     local x,y = -25, -5
     local w,h = 50, 5
     local teamColor = team.GetColor(ply:Team())
 
-    DrawPlayerInfos(x,y,w,h, ply, teamColor)
+    DrawPlayerInfos(x,y,w,h, ply, teamColor, distance)
 end
 
 function GM:PaintHealthbar()
@@ -39,10 +57,12 @@ function GM:PaintHealthbar()
 end
 
 function GM:DrawPlayerClass(ply)
-    local x,y = -25, -5
+    local icon = ply:GetClassIcon(ply)
+    if !icon then return end
+
     surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
-    surface.DrawTexturedRect(x - 15, y - 5, 16,16)
+    surface.SetMaterial(icon)
+    surface.DrawTexturedRect(-38, -10, 16,16)
 end
 
 local teams = {} --TODO move this into vgui

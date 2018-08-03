@@ -1,5 +1,6 @@
 
 local skill = Skill( "air_fly" )
+skill:SetDescription("Fly forward and try not to run into something.")
 skill:SetMaxLive( 10 )
 skill:SetCooldown( 0.5 )
 skill:SetCastUntilRelease( true )
@@ -13,7 +14,7 @@ function skill:Stage1( ent )
     if CLIENT then return end
 
     if caster:OnGround() then
-        if ent.alive > 0.5 then ent:Remove() end
+        if ent.alive > 0.5 then ent:Remove() return end
         caster:ReachVelocity(_VECTOR.UP * 500)
         return
     end
@@ -40,10 +41,12 @@ if SERVER then
         ent:SetInvisible( true )
         ent:RemoveOnDeath()
         ent:SetPos( caster:GetPos() )
+        caster:SetFallDamper( 10 )
     end
 
     function skill:OnRemove( ent )
         ent:GetCaster():SetMoveType(MOVETYPE_WALK)
+        ent:GetCaster():SetFallDamper(0)
     end
 end
 

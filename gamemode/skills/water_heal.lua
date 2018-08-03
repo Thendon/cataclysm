@@ -1,5 +1,6 @@
 
 local skill = Skill( "water_heal" )
+skill:SetDescription("Heal your allies.")
 skill:SetMaxLive( 10 )
 skill:SetCooldown( 0.5 )
 skill:SetCleverCast( true )

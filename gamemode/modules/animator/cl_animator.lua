@@ -10,7 +10,7 @@ local camRotation = false
 local animationFinder = false --Scroll through usable acts
 
 local animationCreator = false --Loop Animation
-local animationToLoop = "shoot_stone"
+local animationToLoop = "fly2"
 
 local justCam = false
 //###################################################
@@ -128,7 +128,7 @@ local function animatorCam( ply, pos, angles, fov )
     local t = CurTime()
     local x = math.sin(t)
     local y = math.cos(t)
-    local plyPos = ply:GetPos() + Vector(0,0,35)
+    local plyPos = ply:GetPos() + Vector(0,0,60)
     local lastAng = Angle()
 
     view.origin = plyPos + (camRotation and Vector(x,y,0) or lastAng:Forward() * (-1)) * camDistance

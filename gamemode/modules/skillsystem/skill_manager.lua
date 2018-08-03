@@ -29,6 +29,7 @@ function skill_manager.GetAll()
 end
 
 function skill_manager.Clear()
+    print("Clear")
     for k, skill in next, skill_manager.GetAll() do
         skill:Remove()
     end
@@ -118,7 +119,18 @@ if CLIENT then
         return teamPly != teamLocal
     end
 
-    function skill_manager.CleverCastPlayer( pressing, trace, rangeSqr, friendly )
+    local function IsValidTarget(ply, rangeSqr, friendly, pos)
+        if !IsValid(ply) then return false end
+        if !ply:IsPlayer() then return false end
+        if ply == LocalPlayer() then return false end
+        if !checkTeam(ply, friendly) then return false end
+        pos = pos or ply:GetPos()
+        local dir = pos - LocalPlayer():GetPos()
+        if dir:LengthSqr() > rangeSqr then return false end
+        return dir
+    end
+
+    --[[function skill_manager.CleverCastPlayer( pressing, trace, rangeSqr, friendly )
         if (!checkRange(trace.HitPos, rangeSqr) or !trace.Entity or !trace.Entity:IsPlayer() or !checkTeam(trace.Entity, friendly)) then
             skill_manager.ccply = nil
             return false
@@ -131,20 +143,19 @@ if CLIENT then
         end
 
         return true, { target = trace.Entity }
-    end
+    end]]
 
     local function getClosestPlayer(dir, rangeSqr, friendly, lock)
         local closestPlayer
         local closestDot = 0
-        local pos = LocalPlayer():GetPos()
 
         for k, ply in next, player.GetAll() do
-            if (ply == LocalPlayer()) then continue end
-            if (!checkTeam(ply, friendly)) then continue end
+            local plyDir = IsValidTarget(ply, rangeSqr, friendly)
+            if !plyDir then continue end
 
-            local plyDir = ply:GetPos() - pos
-            if (plyDir:LengthSqr() > rangeSqr) then continue end
-            if (ply == LocalPlayer()) then continue end
+            local eyePos = LocalPlayer():EyePos()
+            local tr = util.TraceLine({start = eyePos, endpos = eyePos + plyDir, filter = LocalPlayer()})
+            if tr.Entity != ply then continue end
 
             plyDir:Normalize()
             local plyDot = plyDir:Dot( dir )
@@ -162,7 +173,7 @@ if CLIENT then
         lock = lock or 0.95
 
         local closestPlayer
-        if trace.Entity and trace.Entity:IsPlayer() and checkTeam(trace.Entity, friendly) then
+        if IsValidTarget(trace.Entity, rangeSqr, friendly, trace.HitPos) then
             closestPlayer = trace.Entity
         else
             closestPlayer = getClosestPlayer( trace.Normal, rangeSqr, friendly, lock )

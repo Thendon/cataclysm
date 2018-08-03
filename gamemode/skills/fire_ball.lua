@@ -1,9 +1,10 @@
 local end_up = 0.35
 local skill = Skill( "fire_ball" )
+skill:SetDescription("Throw a fireball, which explodes on impact.")
 skill:SetStages({ end_up })
 skill:SetCastTime( 0.5 )
 skill:SetMaxLive( 10 )
-skill:SetCooldown( 10 )
+skill:SetCooldown( 1 ) --10 )
 skill:SetDamageType( "fire" )
 
 local moveSpeed = 5000
@@ -20,6 +21,9 @@ local sounds = {
 
 function skill:Stage1( ent )
     local caster = ent:GetCaster()
+
+    if CLIENT and caster != LocalPlayer() then return end
+
     local forward = caster:GetRight():Cross(_VECTOR.UP)
     ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() - forward * 30 )
     ent:SetAngles( forward:Angle() )
@@ -59,7 +63,8 @@ end
 
 if SERVER then
     function skill:Spawn( ent, caster )
-        ent:SetModel( "models/props/cs_militia/militiarock05.mdl" )
+        ent:SetModel( "models/props_wasteland/rockgranite02a.mdl" )
+        ent:SetModelScale( 0.3 )
         ent:SetInvisible(true)
         ent:InitPhys(ELEMENT_PHYS_TYPE.GHOST)
         ent:SetCustomCollisionCheck( true )
@@ -69,7 +74,6 @@ if SERVER then
     end
 
     function skill:PhysicsCollide( ent, data, phys )
-        print("SET DESTROY FLAG") --check in gm_dunes
         ent:SetDestroyFlag(true)
     end
 end
@@ -86,8 +90,10 @@ function skill:OnRemove( ent )
 
     local hits = bounds.objectsInSphere( player.GetAll(), pos, blastRange )
     for _, hit in next, hits do
+        if !EntsInSight(ent, hit.obj) then continue end
+
         local damage = ( 1 - hit.distance / blastRange ) * blastDamage
-        --print(hit.ply, damage)
+        print(hit.obj, damage, hit.obj:GetMaxHealth())
         local velocity = hit.obj:GetPos() - pos
         velocity.z = velocity.z + 100
         hit.obj:SetVelocity(velocity:GetNormalized() * blastPower * damage)

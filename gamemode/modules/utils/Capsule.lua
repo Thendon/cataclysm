@@ -75,7 +75,7 @@ function Capsule:Draw()
     render.DrawWireframeSphere( pos1, self.radius, drawDetail, drawDetail, _COLOR.GREEN, true )
     render.DrawWireframeSphere( pos2, self.radius, drawDetail, drawDetail, _COLOR.GREEN, true )
 end
-
+--MIGHT BE BROKEN
 function Capsule:GetNearestPointTo( ent )
     local dot = self:GetForward():Dot( ent:GetPos() - self.Entity:GetPos() )
     return self:PosToWorld(Vector(dot,0,0))
@@ -84,7 +84,7 @@ end
 function Capsule:GetDirectionTo( ent )
     return ent:GetPos() - self:GetNearestPointTo( ent )
 end
-
+--UNTIL HERE
 function Capsule:SetRadius(radius)
     self.radius = radius
     self.radiusSqr = radius * radius

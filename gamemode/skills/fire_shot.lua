@@ -1,5 +1,6 @@
 
 local skill = Skill( "fire_shot" )
+skill:SetDescription("Throw a short stream of straight forward.")
 local distance = 280
 skill:SetMaxLive( 1 )
 skill:SetCooldown( 0.5 )

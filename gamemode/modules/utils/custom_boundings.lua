@@ -153,3 +153,18 @@ _G.CalcUpRight = function( forward )
 
     return up, right
 end
+
+_G.EntsInSight = function( ent1, ent2 )
+    if !IsValid(ent1) or !IsValid(ent2) then return false end
+
+    local tr = util.TraceLine({
+        start = ent1:GetPos(),
+        endpos = ent2:GetPos(),
+        filter = {ent1},
+        collisiongroup = COLLISION_GROUP_DEBRIS
+    })
+
+    --print(ent1, ent2, tr.Hit, tr.Entity)
+
+    return !tr.Hit
+end

@@ -1,5 +1,7 @@
 _G.music_machine = music_machine or {}
 
+local BGMVolume = 0.5
+
 local MUSIC_STATES = {}
 MUSIC_STATES.OVER = -3
 MUSIC_STATES.LOADING = -2
@@ -92,7 +94,7 @@ local function BufferTrack()
         --noplay = does not start without command, noblock = enables looping
         sound.PlayFile( file, flags, function(channel, errID, errName)
             if (!channel) then error("Music could not be buffered (" .. tostring(errName) .. ")") end
-            --if looping then channel:EnableLooping(true) end
+            channel:SetVolume(BGMVolume)
             music_machine.sequences[k].channel = channel
         end)
 
@@ -153,8 +155,16 @@ local function PlayNextSequence( sequence )
     sequence = sequence or GetNextSequence()
     PrintTable(sequence)
     if IsLoopingSequence( sequence ) then sequence.channel:EnableLooping(true) end
+
+    local prevVolume = system.HasFocus() and BGSVolume or 0
+    if music_machine.sequence then
+        prevVolume = music_machine.sequence.channel:GetVolume()
+    end
+
     music_machine.sequence = sequence
     music_machine.state = music_machine.sequence.state or music_machine.sequence.transition
+
+    music_machine.sequence.channel:SetVolume( prevVolume )
     music_machine.sequence.channel:Play()
 end
 
@@ -166,8 +176,6 @@ local function SwitchState( desiredSequence )
     local ending = sequence.channel:GetLength() - sequence.channel:GetTime()
     local delta = DeltaTime()
     if ending > delta and delta < 1 or delta > 1 and sequence.channel:GetState() == GMOD_CHANNEL_PLAYING then return end
-    --sequence.channel:Pause()
-    --sequence.channel:SetTime(0)
 
     PlayNextSequence( desiredSequence )
 end
@@ -182,8 +190,17 @@ local function HasAlternatives(sequence)
     return false
 end
 
+local function UpdateVolume()
+    local volume = music_machine.sequence.channel:GetVolume()
+    local fade = SoundFadeFocus( volume, BGMVolume )
+    volume = FadeTo( volume, fade, 1 )
+    music_machine.sequence.channel:SetVolume(volume)
+end
+
 local function HandlePlayingState()
     --print(desiredState, music_machine.state)
+
+    UpdateVolume()
 
     if desiredState != music_machine.state then
         SwitchState()

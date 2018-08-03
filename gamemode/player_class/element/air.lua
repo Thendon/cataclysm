@@ -7,7 +7,7 @@ player.Icon = Material("element/classes/air.png", "unlitgeneric")
 player.Color = _COLOR.WHITE
 player.Sound = "taikos2"
 player.Track = "calm"
-player.Health = 100
+player.Health = 150
 
 player.skills = {}
 player.skills[KEY_Q] = "air_storm"

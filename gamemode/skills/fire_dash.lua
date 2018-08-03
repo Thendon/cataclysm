@@ -1,4 +1,5 @@
 local skill = Skill( "fire_dash")
+skill:SetDescription("Dash forward. You can't stop once started though!")
 skill:SetMaxLive( 1 )
 skill:SetCooldown( 1 )
 
@@ -6,6 +7,9 @@ local power = 1750
 
 function skill:Stage1( ent )
     local caster = ent:GetCaster()
+
+    if CLIENT and caster != LocalPlayer() then return end
+
     ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() )
     local forward = caster:GetRight():Cross(_VECTOR.UP):GetNormalized()
     ent:SetAngles( forward:Angle() )

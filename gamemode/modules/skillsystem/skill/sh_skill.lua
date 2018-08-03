@@ -5,8 +5,9 @@ Skill.TARGET.WORLD = 1
 Skill.TARGET.PLAYER = 2
 Skill.TARGET.PLAYERLOCK = 3
 
+AccessorFunc( Skill, "description", "Description", FORCE_STRING )
 AccessorFunc( Skill, "maxlive", "MaxLive", FORCE_NUMBER )
-AccessorFunc( Skill, "cast", "CastTime", FORCE_NUMBER )
+AccessorFunc( Skill, "cast", "CastTime", FORCE_NUMBER ) --TODO unused but good idea
 AccessorFunc( Skill, "range", "Range", FORCE_NUMBER )
 AccessorFunc( Skill, "rangeSqr", "RangeSqr", FORCE_NUMBER )
 AccessorFunc( Skill, "lockrange", "Lockrange", FORCE_NUMBER )
@@ -22,6 +23,7 @@ AccessorFunc( Skill, "stages", "Stages" )
 
 function Skill:_init( name )
     self.name = name
+    self.description = ""
     self.cooldown = 0
     self.stages = {}
     self.cast = 0
@@ -34,7 +36,7 @@ function Skill:_init( name )
     self.cleverFriendly = false
     self.castOnRelease = false
     self.castUntilRelease = false
-    self.icon = Material("element/skills/" .. name .. ".png")
+    self.icon = Material("element/skills/" .. name .. ".png", "noclamp")
 end
 
 function Skill:CanBeActivated( caster, pressing, cleverData )

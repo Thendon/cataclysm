@@ -1,5 +1,6 @@
 
 local skill = Skill( "water_shot" )
+skill:SetDescription("Shoot water at your enemies.")
 skill:SetMaxLive( 5 )
 skill:SetCooldown( 1 )
 skill:SetCleverCast( true )

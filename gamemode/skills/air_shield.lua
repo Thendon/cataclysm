@@ -3,6 +3,7 @@ local immune = 5
 local rate = 0.5
 
 local stage2 = immune - 2
+skill:SetDescription("Become completely immune to damage and move everything out of your way")
 skill:SetMaxLive( immune )
 skill:SetCooldown( 10 )
 skill:SetStages( { stage2 } )
@@ -48,22 +49,18 @@ if SERVER then
         ent:SetTriggerFlag( true )
         ent:SetTouchRate( rate )
         ent:SetCustomCollider( Capsule( col ) )
-        ent:SetCollideWithPlayers( false )
+        ent:SetCollideWithPlayers( true )
         ent:SetCollideWithSkills( true )
         ent:RemoveOnDeath()
         ent:SetPos( caster:GetPos() + _VECTOR.UP * 50 )
 
-        caster:SetSkillImmune( immune )
-        caster:SetFallImmune( immune )
+        caster:SetDamageImmune( immune )
     end
 
-    function skill:StartTouch( ent, touched )
-        if ent:IsPlayer() then return end
-
-        local physObj = ent:GetPhysicsObject()
-        if (!IsValid(physObj)) then return end
-
-        physObj:SetVelocity(-physObj:GetVelocity())
+    function skill:Touch( ent, touched )
+        local direction = (touched:GetPos() - ent:GetPos()):GetNormalized() * 500
+        direction.z = math.max(direction.z, 250)
+        touched:SetVelocity( direction )
     end
 end
 

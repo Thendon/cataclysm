@@ -64,7 +64,7 @@ if (SERVER) then
 		--[[ Skeleton Solution
 		local args = { ... }
 
-		if (!isplayer(player)) then -- isplayer() => local function isplayer(obj) return isentity(obj) and obj:IsPlayer() end 
+		if (!isplayer(player)) then -- isplayer() => local function isplayer(obj) return isentity(obj) and obj:IsPlayer() end
 			table.insert( args, 1, functionName )
 			functionName = player
 			player = player.GetAll()

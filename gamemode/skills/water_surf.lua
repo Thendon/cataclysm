@@ -1,5 +1,6 @@
 
 local skill = Skill( "water_surf" )
+skill:SetDescription("Summon a wave that boosts you forward. (You have to remain near ground) Using this in water boosts the speed!")
 local duration = 3
 
 local start = 0.5
@@ -9,6 +10,7 @@ skill:SetCastUntilRelease( true )
 skill:SetStages({ start })
 
 local speed = 1000
+local range = 150
 
 local function posEnt( ent )
     local caster = ent:GetCaster()
@@ -25,7 +27,7 @@ end
 
 function skill:Transition1( ent )
     if CLIENT then return end
-    ent:GetCaster():SetFallDamper( duration, 0.25 )
+    ent:GetCaster():SetFallDamper( duration, 0.5 )
 end
 
 function skill:Stage1( ent )
@@ -39,20 +41,36 @@ function skill:Stage2( ent )
 
     if caster:OnGround() then
         caster:SetMoveType(MOVETYPE_WALK)
-        caster:ReachVelocity(_VECTOR.UP * 500)
+        caster:ReachVelocity(_VECTOR.UP * 250)
         return
     end
 
+    local boost = 1
+
     local tr = util.TraceLine({
         start = caster:GetPos(),
-        endpos = caster:GetPos() - _VECTOR.UP * 50,
+        endpos = caster:GetPos() - _VECTOR.UP * range,
         collisiongroup = COLLISION_GROUP_WORLD
     })
 
-    if !tr.Hit then return end
+    if !tr.Hit then
+        tr = util.TraceLine({
+            start = caster:GetPos(),
+            endpos = caster:GetPos() - _VECTOR.UP * range,
+            mask = CONTENTS_WATER
+        })
 
-    caster:SetMoveType(MOVETYPE_FLYGRAVITY)
-    caster:ReachVelocity(caster:GetAimVector() * speed)
+        if !tr.Hit and caster:WaterLevel() < 1 then
+            caster:SetMoveType(MOVETYPE_WALK)
+            return
+        end
+
+        boost = 1.5
+    end
+
+    caster:SetMoveType(MOVETYPE_FLY)
+    local direction = caster:GetAimVector() * speed * boost
+    caster:ReachVelocity(LerpVector(FrameTime() * 10, caster:GetVelocity(), direction))
 end
 
 if CLIENT then

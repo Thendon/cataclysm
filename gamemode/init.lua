@@ -5,6 +5,8 @@ AddCSLuaFile( "sh_loader.lua" )
 
 include( "shared.lua" )
 
+local respawnWait = 3
+
 function GM:PlayerInitialSpawn( ply )
     ply:SetTeam(team.BestAutoJoinTeam())
 end
@@ -78,14 +80,31 @@ function GM:PlayerDeathSound()
 end
 
 function GM:DeathMessage( victim, inflictor, attacker )
-    attacker = attacker:IsWorld() and "world" or attacker:GetName()
+    inflictor = inflictor:IsWorld() and "world" or inflictor:GetName()
+    --todo send team colors and attacker name instead
     netstream.Start(player.GetAll(), "DeathMessage", victim, attacker, inflictor)
 end
 
 function GM:PlayerDeath( victim, inflictor, attacker )
     victim:OnDeath( inflictor, attacker )
-    victim.NextSpawnTime = CurTime() + 3
+    victim.NextSpawnTime = CurTime() + respawnWait
     self:DeathMessage(victim, inflictor, attacker)
+end
+
+function GM:DoPlayerDeath(ply, attacker, dmgInfo)
+    ply:CreateRagdoll()
+    if round_manager.GetRoundState() != ROUND_STATE.ACTIVE then return end
+
+    ply:AddDeaths( 1 )
+
+    if ( !attacker:IsValid() or !attacker:IsPlayer() ) then return end
+    if ( attacker == ply ) then return end
+
+    attacker:AddScore( 10 )
+    for k, assist in next, ply:GetAssists() do
+        if assist.player == attacker then continue end
+        assist.player:AddScore( 5 )
+    end
 end
 
 function GM:ShouldCollide(ent1, ent2)
@@ -97,7 +116,15 @@ end
 
 function GM:EntityTakeDamage( ent, dmg )
     --TODO remove physics damage to player
-    if (dmg:GetInflictor().isskill) then print("stopped phys dmg") return true end
+    if (dmg:GetAttacker().isskill) then return true end
+end
+
+function GM:PlayerCanPickupWeapon(ply, wep)
+    return false
+end
+
+function GM:PlayerCanPickupWeapon( ply, item )
+    return false
 end
 
 netstream.Hook("GM:FinishedLoading", function(ply)

@@ -3,7 +3,7 @@ _G.round_manager = round_manager or {}
 local wins = 5
 local warmupTime = 3 * 60
 local prepTime = 1 * 30
-local roundTime = 10 * 60
+local roundTime = 5 * 60
 local overTime = 1 * 30
 --[[
 warmupTime = 3
@@ -207,8 +207,8 @@ if SERVER then
         if state == ROUND_STATE.WARMUP then
             --round_manager.ResetSpawnPoints()
             spawn_manager.LoadSpawnFile()
-            spawn_manager.SwapSpawnPoints()
         elseif state == ROUND_STATE.PREPARING then
+            spawn_manager.SwapSpawnPoints()
             skill_manager.Clear()
             round_manager.RespawnAll(true)
             round_manager.NextRound()
@@ -221,7 +221,6 @@ if SERVER then
             round_manager.ResetCooldowns()
         elseif state == ROUND_STATE.OVER then
             round_manager.ScoreWinner()
-            spawn_manager.SwapSpawnPoints()
         elseif state == ROUND_STATE.GAMEOVER then
             round_manager.AnnounceWinner()
         end

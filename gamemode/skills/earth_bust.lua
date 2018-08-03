@@ -1,9 +1,10 @@
 local skill = Skill( "earth_bust" )
+skill:SetDescription("Silence your opponents and take them the ability to cast.")
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
 skill:SetMaxLive( 1.75 )
 skill:SetRange(1000)
-skill:SetCooldown( 1 )
+skill:SetCooldown( 9 )
 skill:SetDamageType( "earth" )
 
 local silenceTime = 2
@@ -14,7 +15,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_stone")
+        caster:PlayAnimation("summon_earth")
         ent:GetTarget():PlayAnimation("handcuffed")
         ent:CreateParticleEffect("element_earth_gather", 1)
         ParticleEffect("element_earth_summon", caster:GetPos(), Angle())

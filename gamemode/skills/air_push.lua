@@ -1,5 +1,6 @@
 
 local skill = Skill( "air_push" )
+skill:SetDescription("Push your opponents back.")
 skill:SetMaxLive( 1 )
 skill:SetCooldown( 0.5 )
 skill:SetDamageType( "air" )

@@ -1,4 +1,5 @@
 local skill = Skill( "fire_dragon")
+skill:SetDescription("Blow a constant fire stream on your enemies.")
 skill:SetMaxLive( 2 )
 skill:SetCooldown( 1 )
 
@@ -12,6 +13,9 @@ col:SetPos2Dest(Vector(range,0,0))
 
 function skill:Stage1( ent )
     local caster = ent:GetCaster()
+
+    if CLIENT and caster != LocalPlayer() then return end
+
     local forward = caster:GetAimVector() --caster:GetRight():Cross(_VECTOR.UP)
     ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() )
     ent:SetAngles( forward:Angle() )

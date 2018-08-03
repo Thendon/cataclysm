@@ -8,6 +8,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
+    self:DrawShadow(false)
 end
 
 function ENT:GetSkill()

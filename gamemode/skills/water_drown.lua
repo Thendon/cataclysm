@@ -1,5 +1,6 @@
 
 local skill = Skill( "water_drown" )
+skill:SetDescription("Silence & Root an enemy and drown him in a ball of water.")
 
 local drownTime = 5
 local start = 1

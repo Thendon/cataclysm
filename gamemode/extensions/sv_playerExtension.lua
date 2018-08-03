@@ -1,26 +1,13 @@
 local player = FindMetaTable( "Player" )
 
 local speedEpsilon = 500
+local stopEpsilon = 700
 local speedDamageFactor = 0.05
 local waitAfterPhysHit = 0.05
-local assumeHitInflictor = 10
+local assumeHitAttacker = 7
+local maxFallDmg = 45
 
-local fallsounds = {
-    Sound("player/damage1.wav"),
-    Sound("player/damage2.wav"),
-    Sound("player/damage3.wav")
-}
-
-local deathsounds = {
-    Sound("player/death1.wav"),
-    Sound("player/death2.wav"),
-    Sound("player/death3.wav"),
-    Sound("player/death4.wav"),
-    Sound("player/death5.wav"),
-    Sound("player/death6.wav")
-}
-
-local fallsounds = {
+local fallsounds_hard = {
     Sound("physics/body/body_medium_impact_hard1.wav"),
     Sound("physics/body/body_medium_impact_hard2.wav"),
     Sound("physics/body/body_medium_impact_hard3.wav"),
@@ -29,7 +16,7 @@ local fallsounds = {
     Sound("physics/body/body_medium_impact_hard6.wav"),
 }
 
-local fallsounds2 = {
+local fallsounds_soft = {
     Sound("physics/body/body_medium_impact_soft1.wav"),
     Sound("physics/body/body_medium_impact_soft2.wav"),
     Sound("physics/body/body_medium_impact_soft3.wav"),
@@ -50,11 +37,13 @@ STATUS.SILENCED = 1
 STATUS.CASTING = 2
 STATUS.FALLIMMUNE = 3
 STATUS.SKILLIMMUNE = 4
-STATUS.FALLDAMPED = 5
-STATUS.SLOWED = 6
-STATUS.ROOTED = 7
+STATUS.DMGIMMUNE = 5
+STATUS.FALLDAMPED = 6
+STATUS.SLOWED = 7
+STATUS.ROOTED = 8
 
 speedEpsilon = speedEpsilon * speedEpsilon
+stopEpsilon = stopEpsilon * stopEpsilon
 
 function player:FinishedLoading()
     self.loaded = true
@@ -75,19 +64,13 @@ function player:FinishMove(mv)
     local velocity = mv:GetVelocity()
     local veloLength = velocity:LengthSqr()
     local lastLength = self.lastVelocity:LengthSqr()
-
-    local direction = velocity - self.lastVelocity
     self.lastVelocity = velocity
 
-    --[[local lastOnGround = self.lastOnGround
-    self.lastOnGround = self:OnGround()
-
-    if self.lastOnGround and lastOnGround then return end]]
+    if veloLength > stopEpsilon then return end
     if veloLength >= lastLength then return end
 
     local difference = lastLength - veloLength
     if (difference < speedEpsilon) then return end
-    print(direction, difference)
 
     local damper = self:GetFallDamper()
     if damper then
@@ -96,27 +79,27 @@ function player:FinishMove(mv)
     end
 
     local speed = math.sqrt(difference - speedEpsilon)
-    self:HitWorld( speed, direction )
+    self:HitWorld( speed )
 end
 
-function player:HitWorld( speed, direction )
+function player:HitWorld( speed )
     if !self:Alive() then return end
 
-    if self:IsFallImmune() then return end
+    if self:IsFallImmune() or self:IsDamageImmune() then return end
     if ((CurTime() - self:LastPhysHit()) < waitAfterPhysHit) then return end
     self:UpdateLastPhysHit()
 
-    local damage = speed * speedDamageFactor
+    local damage = math.min(speed * speedDamageFactor, maxFallDmg)
 
     local dmg = DamageInfo()
     dmg:SetDamageType(DMG_GENERIC) --DMG_FALL
-    dmg:SetAttacker(game.GetWorld())
+    dmg:SetInflictor(game.GetWorld())
 
     local lastHit = self:LastHit()
-    if (lastHit and lastHit.time > self:LastDeath() and lastHit.time + assumeHitInflictor > CurTime()) then
-        dmg:SetInflictor(lastHit.inflictor)
+    if (lastHit and lastHit.time > self:LastDeath() and lastHit.time + assumeHitAttacker > CurTime()) then
+        dmg:SetAttacker(lastHit.attacker)
     else
-        dmg:SetInflictor(game.GetWorld())
+        dmg:SetAttacker(game.GetWorld())
     end
     dmg:SetDamage(damage)
 
@@ -126,7 +109,7 @@ function player:HitWorld( speed, direction )
     self.nextFallSound = self.nextFallSound or now
     if self.nextFallSound < now then
         self.nextFallSound = now + 1
-        fallsound = damage > 5 and table.Random(fallsounds) or table.Random(fallsounds2)
+        fallsound = damage > 5 and table.Random(fallsounds_hard) or table.Random(fallsounds_soft)
         sound.Play(fallsound, self:GetPos(), 80, {90, 110}, 1)
     end
 end
@@ -146,7 +129,7 @@ end
 end]]
 
 function player:TakeSkillDamage( dmgInfo, dmgType )
-    if self:IsSkillImmune() then return end
+    if self:IsSkillImmune() or self:IsDamageImmune() then return end
 
     self:UpdateLastPhysHit() --todo create something better
     self:TakeDamageInfo( dmgInfo )
@@ -224,6 +207,14 @@ end
 
 function player:IsFallImmune()
     return self:HasStatus( STATUS.FALLIMMUNE )
+end
+
+function player:SetDamageImmune( time )
+    self:SetStatusTime( STATUS.DMGIMMUNE, time )
+end
+
+function player:IsDamageImmune()
+    return self:HasStatus( STATUS.DMGIMMUNE )
 end
 
 function player:SetFallDamper( time, factor, factorFactor )

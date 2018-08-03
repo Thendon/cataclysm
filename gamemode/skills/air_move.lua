@@ -1,5 +1,6 @@
 
 local skill = Skill( "air_move" )
+skill:SetDescription("Thrust your opponents out of the way.")
 skill:SetMaxLive( 2 )
 skill:SetCooldown( 3 )
 skill:SetDamageType( "air" )
@@ -45,9 +46,17 @@ if SERVER then
     end
 
     function skill:Touch( ent, touched )
-        local direction = ent:GetCustomCollider():GetDirectionTo( touched )
+        --[[local direction = ent:GetCustomCollider():GetDirectionTo( touched )
         local velocity = ent:WorldToLocal(direction + ent:GetPos())
         velocity = velocity:GetNormalized() * power
+        velocity.z = touched:OnGround() and 250 or 50
+        touched:ReachVelocity( velocity )]]
+
+        local direction = touched:GetPos() - ent:GetPos()
+        local right = ent:GetRight()
+        local dot = direction:Dot(right)
+
+        local velocity = right * (dot > 0 and 1 or -1) * power
         velocity.z = touched:OnGround() and 250 or 50
         touched:ReachVelocity( velocity )
 

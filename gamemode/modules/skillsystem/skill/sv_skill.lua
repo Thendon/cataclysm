@@ -34,7 +34,7 @@ function Skill:CreateChildEntity( ent, offset, angle )
     skillChild:SetName( self.name )
     skillChild:SetPos( ent:GetPos() + offset )
     if angle then skillChild:SetAngles(angle) end
-    skillChild:SetParent( ent )
+    skillChild:SetParent( ent, 0 )
     skillChild:Spawn()
 
     return skillChild
@@ -48,8 +48,8 @@ function Skill:GenerateDamageInfo(ent, damage, type, velocity)
 
     local dmg = DamageInfo()
     dmg:SetDamageType(type)
-    dmg:SetAttacker(ent)
-    dmg:SetInflictor(ent:GetCaster())
+    dmg:SetInflictor(ent)
+    dmg:SetAttacker(ent:GetCaster())
     if velocity then dmg:SetDamageForce(velocity) end
     dmg:SetDamage(damage)
 

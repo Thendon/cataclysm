@@ -2,7 +2,6 @@ include( "shared.lua" )
 include( "cl_hud.lua" )
 
 local loaded = false
-local BGSVolume = 0.25
 local healthDistance = 1000
 healthDistance = healthDistance * healthDistance
 
@@ -10,30 +9,29 @@ function GM:UpdateAnimation( ply )
     ply:UpdateAnimation()
 end
 
-_G.PlayBGS = function( file )
-    sound.PlayFile("sound/" .. file, "noplay", function( channel )
-        if !IsValid( channel ) then print("couldnt play bgs: " .. tostring(file)) return end
-        if !system.HasFocus() then return end
-
-        channel:SetVolume(BGSVolume)
-        channel:Play()
-    end)
-end
-
-_G.PlayBGL = function( ent, name )
-    local s = CreateSound( ent, name )
-    s:Play()
-    s:ChangeVolume(0)
-    return s
-end
-
 function GM:FinishedLoading()
+    print("finished loading")
     netstream.Start("GM:FinishedLoading")
     skill_manager.Initialize()
 
     loaded = true
 end
 
+hook.Add("Think", "LoadingStatus", function()
+    if (!IsValid(LocalPlayer())) then return end
+
+    hook.Call("FinishedLoading", GAMEMODE)
+    hook.Remove("Think", "LoadingStatus")
+end)
+--[[
+function GM:InitPostEntity()
+    GM:FinishedLoading()
+end
+
+function GM:OnReloaded()
+    GM:FinishedLoading()
+end
+]]
 function GM:Loaded()
     return loaded
 end
@@ -58,23 +56,23 @@ netstream.Hook("DeathMessage", function( victim, attacker, inflictor )
     table.insert(text, teamColor)
     table.insert(text, " killed ")
 
-    if (inflictor == victim) then
+    if (attacker == victim) then
         table.insert(text, "himself")
         chat.AddText(unpack(text))
         return
     end
 
-    if (attacker and !IsValid(inflictor) or inflictor.GetName and attacker != inflictor:GetName()) then
+    if (inflictor and !IsValid(attacker) or attacker.GetName and inflictor != attacker:GetName()) then
         table.insert(text, "from ")
         table.insert(text, _COLOR.RED) --TODO SHOW SKILL ICON INSTEAD
-        table.insert(text, attacker)
+        table.insert(text, inflictor)
         table.insert(text, teamColor)
     end
 
-    if (IsValid(inflictor) and inflictor:IsPlayer()) then
+    if (IsValid(attacker) and attacker:IsPlayer()) then
         table.insert(text, " by ")
-        table.insert(text, player_manager.RunClass(inflictor, "GetClassColor"))
-        table.insert(text, inflictor:GetName())
+        table.insert(text, player_manager.RunClass(attacker, "GetClassColor"))
+        table.insert(text, attacker:GetName())
     end
 
     chat.AddText(unpack(text))
@@ -90,13 +88,18 @@ local function GetEyeBounds()
 end
 
 local function ShouldDrawPlayerInfos(ply)
+    --if ( ply:IsSpectator() ) then return false end
     if ( ply == LocalPlayer() ) then return false end
     if (!IsValid(ply)) then return false end
     if (!ply:Alive()) then return false end
 
     local plyPos = ply:GetPos()
-    if (healthDistance < (plyPos - LocalPlayer():GetPos()):LengthSqr()) then return false end
-    return plyPos
+    local distance = (plyPos - LocalPlayer():GetPos()):LengthSqr()
+    if (healthDistance < distance) then return false end
+    return plyPos, distance
+end
+
+function GM:HUDDrawTargetID()
 end
 
 function GM:HUDShouldDraw( name )
@@ -113,14 +116,61 @@ function GM:ScoreboardHide()
     ele_scoreboard:Hide()
 end
 
---going for the stupid way, garry xD
 function GM:HUDDrawScoreBoard()
     if ele_scoreboard:Hidden() then return end
 
     hook.Call("PaintRound", GAMEMODE)
 end
 
-hook.Add("HUDPaint", "Healthbar", function()
+local shoulder = 0
+
+local function CalcOptimalCamPos( origin, angles )
+    local camPos = origin - angles:Forward() * 100 + angles:Up() * 20 + angles:Right() * shoulder
+
+    local tr = util.TraceLine({
+        start = origin,
+        endpos = camPos,
+        collisionGroup = COLLISION_GROUP_DEBRIS,
+        --for some reason i m hitting the back of my head without this?!
+        filter = LocalPlayer()
+    })
+
+    return tr.HitPos or camPos
+end
+
+local lastCamPos
+local lastCamAng
+
+function GM:CalcView( ply, origin, angles, fov, znear, zfar )
+    local camPos = CalcOptimalCamPos( origin, EyeAngles() )
+    local camAng = angles
+
+    lastCamPos = lastCamPos or camPos
+    lastCamAng = lastCamAng or angles
+
+    local delta = math.Clamp(FrameTime() * 20, 0, 1)
+    camPos = LerpVector(delta, lastCamPos, camPos)
+    camAng = LerpAngle(delta, lastCamAng, camAng)
+
+    lastCamPos = camPos
+    lastCamAng = camAng
+
+    local view = {}
+    view.origin		= camPos
+    view.angles		= camAng
+    view.fov		= fov
+    view.znear		= znear
+    view.zfar		= zfar
+    view.drawviewer	= true
+
+    player_manager.RunClass( ply, "CalcView", view )
+
+    return view
+end
+
+hook.Add( "CalcView", "MyCalcView", animatorCam )
+
+hook.Add("HUDPaint", "ElementPaint", function()
     if LocalPlayer():IsSpectator() then return end
 
     hook.Call("PaintHealthbar", GAMEMODE)
@@ -128,13 +178,7 @@ hook.Add("HUDPaint", "Healthbar", function()
     hook.Call("PaintScore", GAMEMODE)
 end)
 
-hook.Add("Think", "LoadingStatus", function()
-    if (!IsValid(LocalPlayer())) then return end
-
-    hook.Call("FinishedLoading", GAMEMODE)
-    hook.Remove("Think", "LoadingStatus")
-end)
-
+--[[
 hook.Add("PostPlayerDraw", "Healthbars", function( ply )
     local eyeAng = GetEyeBounds()
     local offset = Vector(0,0,80)
@@ -143,19 +187,23 @@ hook.Add("PostPlayerDraw", "Healthbars", function( ply )
     if !plyPos then return end
 
     cam.Start3D2D(plyPos + offset, eyeAng, 1)
-    hook.Call("DrawPlayerHealthbar", GAMEMODE, ply)
+    print(ply, "draw healthbar")
     cam.End3D2D()
 end)
+]]
 
-hook.Add("PostDrawOpaqueRenderables", "ClassIcons", function()
+hook.Add("PostDrawOpaqueRenderables", "ClassIcons", function(depth, skybox)
+    if skybox then return end
+
     local eyeAng = GetEyeBounds()
     local offset = Vector(0,0,80)
 
     for k, ply in next, player.GetAll() do
-        local plyPos = ShouldDrawPlayerInfos(ply)
+        local plyPos, distance = ShouldDrawPlayerInfos(ply)
         if !plyPos then continue end
 
         cam.Start3D2D(plyPos + offset, eyeAng, 1)
+        hook.Call("DrawPlayerHealthbar", GAMEMODE, ply, distance)
         hook.Call("DrawPlayerClass", GAMEMODE, ply)
         cam.End3D2D()
     end

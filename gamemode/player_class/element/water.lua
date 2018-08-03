@@ -7,7 +7,7 @@ player.Icon = Material("element/classes/water.png", "unlitgeneric")
 player.Color = _COLOR.BLUE
 player.Sound = "taikos1"
 player.Track = "fast"
-player.Health = 200
+player.Health = 250
 
 player.skills = {}
 player.skills[KEY_Q] = "water_drown"
@@ -17,12 +17,13 @@ player.skills[MOUSE_LEFT] = "water_shot"
 player.skills[MOUSE_RIGHT] = "water_heal"
 
 if SERVER then
-    resource.AddWorkshop( 1211334981 ) --ninja
+    resource.AddWorkshop( 471450333 ) --kitana
     resource.AddWorkshop( 780889405 ) --cultist
 end
 
 player.models = {}
-table.insert(player.models, {model = "models/vinrax/player/ninja_player.mdl"})
+
+table.insert(player.models, {model = "models/player/mkx_kitana.mdl"})
 table.insert(player.models, {model = "models/player/jka_cultist.mdl", details = {skin = 2}})
 
 player_manager.RegisterClass("player_water", player, "player_element")

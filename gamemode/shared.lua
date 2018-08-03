@@ -34,7 +34,7 @@ local function CalcDelta()
     lastThink = now
 end
 
-function GM:Tick()
+function GM:Think()
     CalcDelta()
     if SERVER then round_manager.Update() end
     if CLIENT then music_manager.Update() end

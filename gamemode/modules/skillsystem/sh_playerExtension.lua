@@ -1,16 +1,16 @@
-local player = FindMetaTable( "Player" )
+local meta = FindMetaTable( "Player" )
 
 local globalCooldown = 0.5
 
 if CLIENT then
     local waitForResponse = 0
 
-    function player:UseKey( key, pressing )
+    function meta:UseKey( key, pressing )
         local skill = skill_manager.GetSkill(self.skills[key])
 
         local hasTarget, cleverData = skill:CleverCast( pressing )
 
-        if (skill:GetCastUntilRelease() and (!pressing or !hasTarget)) then
+        if (skill:GetCastUntilRelease() and self:GetCasting(skill) and (!pressing or !hasTarget)) then
             self:SetCasting(skill, false)
             netstream.Start("player:BreakSkill", skill:GetName() )
             return
@@ -25,19 +25,19 @@ if CLIENT then
         netstream.Start("player:UseSkill", skill:GetName(), cleverData )
     end
 
-    function player:ApplyCooldown(skill, timestamp)
+    function meta:ApplyCooldown(skill, timestamp)
         self:SetCooldown(skill, timestamp - 0.1)
         self:ApplyGlobalCooldown( timestamp - skill:GetCooldown(), 0.1 )
     end
 
-    function player:ResetCooldowns( timestamp )
+    function meta:ResetCooldowns( timestamp )
         for key, skillname in next, self.skills do
             local skill = skill_manager.GetSkill(skillname)
             self:SetCooldown( skill, timestamp + skill:GetCooldown() - 0.1 )
         end
     end
 
-    function player:SetCasting( skill, status )
+    function meta:SetCasting( skill, status )
         self.casting = self.casting or {}
         self.casting[skill] = status
     end
@@ -63,7 +63,7 @@ if CLIENT then
 end
 
 if SERVER then
-    function player:UseSkill( skill, cleverData )
+    function meta:UseSkill( skill, cleverData )
         print(self,skill,cleverData)
 
         if !self:CanActivateSkill( skill ) then --todo add skill conditions
@@ -76,20 +76,20 @@ if SERVER then
         skill:Activate( self, cleverData )
     end
 
-    function player:BreakSkill( skill )
+    function meta:BreakSkill( skill )
         if !skill:GetCastUntilRelease() then return end
 
         self:SetCasting( skill, false )
     end
 
-    function player:ApplyCooldown( skill, time )
+    function meta:ApplyCooldown( skill, time )
         self:SetCooldown( skill, CurTime() + time )
         self:ApplyGlobalCooldown()
 
         netstream.Start( self, "player:ApplyCooldown", skill:GetName(), self.nextUse[skill] )
     end
 
-    function player:ResetCooldowns()
+    function meta:ResetCooldowns()
         for key, skillname in next, self.skills do
             local skill = skill_manager.GetSkill(skillname)
             self:SetCooldown( skill, CurTime() + skill:GetCooldown() )
@@ -98,7 +98,7 @@ if SERVER then
         netstream.Start( self, "player:ResetCooldowns", CurTime() )
     end
 
-    function player:SetCasting( skill, status, entity )
+    function meta:SetCasting( skill, status, entity )
         self.casting = self.casting or {}
         self.castingEnts = self.castingEnts or {}
 
@@ -123,35 +123,35 @@ if SERVER then
     end)
 end
 
-function player:SetCooldown( skill, timestamp )
+function meta:SetCooldown( skill, timestamp )
     self.nextUse = self.nextUse or {}
     self.nextUse[skill] = timestamp
     self.cooldownTime = self.cooldownTime or {}
     self.cooldownTime[skill] = timestamp - CurTime()
 end
 
-function player:CanActivateSkill( skill )
+function meta:CanActivateSkill( skill )
     if (!self:Alive()) then return false end
     if (SERVER and self:IsSilenced()) then return false end
     if self:GetCooldown( skill ) > 0 then return false end
     return true
 end
 
-function player:SkillNextUse( skill )
+function meta:SkillNextUse( skill )
     self.nextUse = self.nextUse or {}
     self.nextUse[skill] = self.nextUse[skill] or 0
 
     return self.nextUse[skill]
 end
 
-function player:GetCooldownLength( skill )
+function meta:GetCooldownLength( skill )
     self.cooldownTime = self.cooldownTime or {}
     self.cooldownTime[skill] = self.cooldownTime[skill] or 1
 
     return self.cooldownTime[skill]
 end
 
-function player:GetCooldown( skill )
+function meta:GetCooldown( skill )
     if (isnumber(skill)) then skill = skill_manager.GetSkill(self.skills[skill]) end
     local nextUse = self:SkillNextUse( skill ) - CurTime()
     local cooldown = self:GetCooldownLength( skill ) or skill.cooldown
@@ -159,19 +159,19 @@ function player:GetCooldown( skill )
     return math.Clamp( nextUse / cooldown, 0, 1)
 end
 
-function player:HandSwitcher()
+function meta:HandSwitcher()
     self.hand = self.hand or false
     self.hand = !self.hand
     return self.hand
 end
 
-function player:GetCasting( skill )
+function meta:GetCasting( skill )
     self.casting = self.casting or {}
 
     return self.casting[skill] or false
 end
 
-function player:ApplyGlobalCooldown( timestamp, epsilon )
+function meta:ApplyGlobalCooldown( timestamp, epsilon )
     timestamp = timestamp or CurTime()
     epsilon = epsilon or 0
 

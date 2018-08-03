@@ -15,8 +15,8 @@ local function processFolder( path, domain, handle, foldername )
         handle( path, filename, foldername )
     end
 
-    for _, foldername in next, folders do
-        processFolder( path .. foldername, domain, handle, foldername )
+    for _, folder in next, folders do
+        processFolder( path .. folder, domain, handle, folder )
     end
 end
 
@@ -106,6 +106,7 @@ print("# Loading Code")
 LoadFolder( GM.Name .. "/gamemode/resources" )
 LoadFolder( GM.Name .. "/gamemode/managers" )
 LoadFolder( GM.Name .. "/gamemode/extensions" )
+LoadFolder( GM.Name .. "/gamemode/modules/skillsystem" ) --cheating to ensure UI has everything ready
 LoadFolder( GM.Name .. "/gamemode/modules" )
 LoadFolder( GM.Name .. "/gamemode/skills" )
 

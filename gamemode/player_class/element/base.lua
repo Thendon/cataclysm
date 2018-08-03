@@ -14,24 +14,27 @@ function player:Init()
     end
     self.Player.keys = skills
 
-    self:SetRandomClassModel()
     self.Player:ResetCooldowns( CurTime() )
 
-    if CLIENT and self.Player:Team() == LocalPlayer():Team() then
-        sound.Play(self.Sound, self.Player:GetPos())
+    if CLIENT then
+        if self.Player:Team() == LocalPlayer():Team() then
+            sound.Play(self.Sound, self.Player:GetPos())
+        end
+        self.Player:SetClassIcon( self.Icon )
     end
 
     if SERVER then
-        self.Player:SetMaxHealth( self.Health )
+        self:SetRandomClassModel()
     end
 end
 
 function player:Spawn()
     self.Player:ResetCooldowns()
 
+    self.Player:SetMaxHealth( self.Health )
     self.Player:SetHealth(self.Player:GetMaxHealth())
-    self.Player:SetSkillImmune(spawnProtection)
-    self.Player:SetFallImmune(spawnProtection)
+    self.Player:SetDamageImmune(spawnProtection)
+    self.Player:WipeAssists()
 end
 
 function player:SetRandomClassModel()

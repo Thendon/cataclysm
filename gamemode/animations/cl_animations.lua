@@ -6,11 +6,11 @@ local swings = {"swing1", "swing2", "swing4"}
 local seqs = {}
 local anim = {}
 
-local seq = Sequence( 1801, 0.05, 0, 1 )
+local seq = Sequence( 1635, 0.05, 0, 1 ) --1801
 seq:SetSound(hits)
 table.insert(seqs, seq)
-table.insert(seqs, Sequence( 1801, 0.1, 1, 1 ))
-table.insert(seqs, Sequence( 1801, 0.2, 1, 0 ))
+table.insert(seqs, Sequence( 1635, 0.1, 1, 1 ))
+table.insert(seqs, Sequence( 1635, 0.2, 1, 0 ))
 local seq = Sequence( 1797, 0.05, 0, 1 )
 seq:SetSound(hits)
 table.insert(seqs, seq)
@@ -21,6 +21,36 @@ table.insert(seqs, Sequence( 1, 1, 0, 0 ))
 anim = Animation( seqs, 1 )
 
 AnimationManager.Add( "shoot_stone", anim )
+
+local seqs = {}
+local anim = {}
+
+local id = 1651
+local val = 1
+local seq = Sequence( id, 0.15, 0, val )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.1, val, val ))
+table.insert(seqs, Sequence( id, 0.25, val, 0 ))
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "shoot_stone2", anim )
+
+local seqs = {}
+local anim = {}
+
+local id = 1625 --1788
+local val = 0.8
+local seq = Sequence( id, 0.25, 0, val )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.25, val, 0.2 ))
+table.insert(seqs, Sequence( id, 0.25, 0.2, val ))
+table.insert(seqs, Sequence( id, 0.25, val, 0.2 ))
+table.insert(seqs, Sequence( id, 0.25, 0.2, 0 ))
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "summon_earth", anim )
 
 seqs = {}
 anim = {}
@@ -174,3 +204,16 @@ table.insert(seqs, Sequence( id, 0.5, val, 0 ))
 anim = Animation( seqs, 1 )
 
 AnimationManager.Add( "fly", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1705
+local val = 0.8
+table.insert(seqs, Sequence( id, 0.5, 0, val ))
+table.insert(seqs, Sequence( id, 10, val, val ))
+table.insert(seqs, Sequence( id, 0.5, val, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "fly2", anim )
