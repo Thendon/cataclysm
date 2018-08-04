@@ -8,5 +8,10 @@ Soundtrack:
 Taikos - Solid Joffre
 Smashmello - https://steamcommunity.com/profiles/76561198004028762/
 
+Libraries:
+Alexander Grist-Hucker - http://www.revotech.org
+thelastpenguin - https://github.com/thelastpenguin/gLUA-Library/tree/master/pON
+Threebow - https://github.com/Threebow/tdlib
+
 Shoutout to:
 rusty - https://steamcommunity.com/id/years/
