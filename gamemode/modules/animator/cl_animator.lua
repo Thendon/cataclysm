@@ -10,7 +10,7 @@ local camRotation = false
 local animationFinder = false --Scroll through usable acts
 
 local animationCreator = false --Loop Animation
-local animationToLoop = "fly2"
+local animationToLoop = "stream_water"
 
 local justCam = false
 //###################################################

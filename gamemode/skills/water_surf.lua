@@ -8,6 +8,7 @@ skill:SetMaxLive( start + duration )
 skill:SetCooldown( 0.5 )
 skill:SetCastUntilRelease( true )
 skill:SetStages({ start })
+skill:SetRefillFactor(2)
 
 local speed = 1000
 local range = 150
@@ -26,8 +27,12 @@ local function posEnt( ent )
 end
 
 function skill:Transition1( ent )
-    if CLIENT then return end
-    ent:GetCaster():SetFallDamper( duration, 0.5 )
+    local caster = ent:GetCaster()
+    if CLIENT then
+        caster:PlayAnimation("fly2")
+        return
+    end
+    caster:SetFallDamper( duration, 0.5 )
 end
 
 function skill:Stage1( ent )
@@ -75,13 +80,13 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
         ent:CreateParticleEffect("element_water_surf", 1)
         ent:EmitSound("water_stream3")
     end
 
     function skill:OnRemove( ent )
         ent:StopSound("water_stream3")
+        ent:GetCaster():StopAnimation()
     end
 end
 

@@ -2,7 +2,7 @@ local skill = Skill( "earth_bust" )
 skill:SetDescription("Silence your opponents and take them the ability to cast.")
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
-skill:SetMaxLive( 1.75 )
+skill:SetMaxLive( 3 )
 skill:SetRange(1000)
 skill:SetCooldown( 9 )
 skill:SetDamageType( "earth" )
@@ -41,6 +41,8 @@ if SERVER then
         ent:SetParent( cleverData.target, attachmentID )
         ent:SetTarget(cleverData.target)
         ent:RemoveOnDeath(cleverData.target)
+
+        self:Hit( ent, cleverData.target )
 
         cleverData.target:Silence( silenceTime )
     end

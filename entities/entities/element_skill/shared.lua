@@ -74,7 +74,7 @@ end
 function ENT:UpdateSkill( stage )
     stage = stage or self:GetNW2Int("stage")
     local skill = self:GetSkill()
-    ecall(skill["Stage" .. stage], skill, self )
+    skill:Update( self, stage )
 
     return skill
 end

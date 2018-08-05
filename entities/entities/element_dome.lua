@@ -7,7 +7,7 @@ end
 
 function ENT:Initialize()
     self:SetModel("models/props_phx/construct/glass/glass_dome360.mdl")
-    self:SetModelScale( 20 )
+    self:SetModelScale( 22 )
     self:DrawShadow(false)
 end
 

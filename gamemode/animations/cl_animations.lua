@@ -217,3 +217,92 @@ table.insert(seqs, Sequence( id, 0.5, val, 0 ))
 anim = Animation( seqs, 1 )
 
 AnimationManager.Add( "fly2", anim )
+
+seqs = {}
+anim = {}
+
+local id = 2002
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1791
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "shoot_water", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1789
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1789
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1789
+local seq = Sequence( id, 0.05, 0, 1 )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.15, 1, 1 ))
+table.insert(seqs, Sequence( id, 0.15, 1, 0 ))
+local id = 1680
+local val = 0.6
+local seq = Sequence( id, 0.05, 0, val )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 3, val, val ))
+table.insert(seqs, Sequence( id, 3, val, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "summon_water", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1693
+local val = 0.6
+local seq = Sequence( id, 0.05, 0, val )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 1, val, val ))
+table.insert(seqs, Sequence( id, 0.15, val, 0 ))
+local id = 1789
+local val = 0.75
+local seq = Sequence( id, 0.35, 0, val )
+seq:SetSound(swings)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 0.25, val, val ))
+table.insert(seqs, Sequence( id, 0.25, val, 0 ))
+
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "summon_water2", anim )
+
+seqs = {}
+anim = {}
+
+local id = 1789
+local val = 0.6
+local seq = Sequence( id, 0.05, 0, val )
+seq:SetSound(hits)
+table.insert(seqs, seq)
+table.insert(seqs, Sequence( id, 10, val, val ))
+table.insert(seqs, Sequence( id, 1, val, 0 ))
+anim = Animation( seqs, 1 )
+
+AnimationManager.Add( "stream_water", anim )

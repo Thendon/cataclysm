@@ -3,7 +3,7 @@ local skill = Skill( "fire_kick" )
 skill:SetDescription("Throw a short stream of fire across the view.")
 local distance = 280
 skill:SetMaxLive( 1 )
-skill:SetCooldown( 0.5 )
+skill:SetCooldown( 2 )
 skill:SetDamageType( "fire" )
 
 local col = Capsule(Vector(0,-20,0), Vector(0,20,0), 20)
@@ -50,7 +50,7 @@ if SERVER then
 
     function skill:Touch( ent, touched )
         local damage = distance - (ent.alive * distance)
-        damage = damage * 0.1
+        damage = damage * 0.5
 
         self:Hit(ent, touched, damage, DMG_FALL, ent:GetForward())
     end

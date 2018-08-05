@@ -2,7 +2,7 @@ _G.music_manager = music_manager or {}
 
 local tracks = {}
 
-local tensionTime = 10
+local tensionTime = 15
 
 local function analyseFile( trackname, file )
     local sequence = {}
@@ -113,11 +113,13 @@ end
 function music_manager.ControlPlaying()
     if round_manager.GetRoundState() != ROUND_STATE.ACTIVE then
         music_manager.SetTrackStatus( false )
+        --print("STOP ROUND")
         return
     end
 
     if !HandleLastHit() and !HandleLastLandedHit() then
         music_manager.SetTrackStatus( false )
+        --print("STOP", HandleLastHit(), HandleLastLandedHit())
         return
     end
 

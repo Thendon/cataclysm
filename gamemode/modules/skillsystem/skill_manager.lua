@@ -29,7 +29,6 @@ function skill_manager.GetAll()
 end
 
 function skill_manager.Clear()
-    print("Clear")
     for k, skill in next, skill_manager.GetAll() do
         skill:Remove()
     end

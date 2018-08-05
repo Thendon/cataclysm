@@ -45,6 +45,7 @@ local playerList = function( panel )
         name:SetText(ply:GetName())
         name:SetFont(font)
         name:SetPos(h,0)
+        name:SetAlpha(ply:Alive() and 255 or 100)
         name:SetSize(size, h)
         name:SetTextColor(color)
 
@@ -72,18 +73,18 @@ local hold_guide = "Cast will be up until the key was released"
 
 local function GenerateGuide( scrw, scrh, derma )
     local size = 128
-    local offset = 16
+    local offset = 32
     local key_offsets = {}
     key_offsets[KEY_Q] = { x = 0, y = 0 }
     key_offsets[KEY_E] = { x = size + offset, y = -200 }
     key_offsets[KEY_LSHIFT] = { x = 2 * size + 2 * offset, y = 0 }
-    key_offsets[MOUSE_LEFT] = { x = scrw - offset * 3 - size * 3, y = -200 }
-    key_offsets[MOUSE_RIGHT] = { x = scrw - offset * 2 - size * 2, y = 0 }
+    key_offsets[MOUSE_LEFT] = { x = scrw - 96 - offset * 3 - size * 3, y = -200 }
+    key_offsets[MOUSE_RIGHT] = { x = scrw - 96 - offset * 2 - size * 2, y = 0 }
 
     for key, skillname in next, LocalPlayer().skills do
         local skill = skill_manager.GetSkill(skillname)
         local x, y = key_offsets[key].x, key_offsets[key].y
-        x = x + 64
+        x = x + 96
         y = y + scrh - 600
         local h = 160
 
@@ -100,7 +101,7 @@ local function GenerateGuide( scrw, scrh, derma )
 
         local guide = TDLib("DLabel", derma)
         guide:ClearPaint()
-        guide:SetPos( x - offset * 3, y )
+        guide:SetPos( x - offset, y )
         guide:SetSize( 256, h )
         guide:SetFont( "Trebuchet24" ) --"fujimaru_small")
         guide:SetWrap( true )
@@ -111,7 +112,7 @@ local function GenerateGuide( scrw, scrh, derma )
         line:ClearPaint()
         line:Background(_COLOR.WHITEFADE)
         line:SetPos( x + size * 0.5, y + h  )
-        line:SetSize( 8, y - h - key_offsets[key].y * 2 - 128)
+        line:SetSize( 8, scrh - y -  h - 256 )
     end
 end
 

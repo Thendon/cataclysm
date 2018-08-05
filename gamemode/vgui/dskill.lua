@@ -3,7 +3,7 @@ local PANEL = {}
 AccessorFunc( PANEL, "key", "Key" )
 
 function PANEL:Init()
-    self.icon = TDLib("DImage", self)
+    self.icon = vgui.Create("DImage", self)
     self.icon:SetPos( 0,0 )
     self.icon.fraction = 0
     self.icon.Paint = function( pnl )
@@ -17,17 +17,26 @@ function PANEL:Init()
         else
             surface.SetDrawColor( _COLOR.WHITEFADE )
         end
+
         surface.DrawTexturedRectUV( 0, h - o, w, o, 0, 1 - f, 1, 1)
+
+        local fuel = self:GetFuel()
+        if fuel == -1 then return end
+        o = fuel * h
+        surface.SetDrawColor( _COLOR.BLACKFADE2 )
+        surface.DrawTexturedRectUV( 0, 0, w, h - o, 0, 0, 1, 1 - fuel )
     end
 
-    self.keyImage = TDLib("DImage", self)
+    self.keyImage = vgui.Create("DImage", self)
     self.keyImage:SetPos( 0,0 )
 
-    self.label = TDLib("DLabel", self)
+    self.label = vgui.Create("DLabel", self)
     self.label:SetPos( 0,0 )
     self.label:SetFont("fujimaru")
     self.label:SetTextColor(_COLOR.BLACK)
     self.label:SetText("")
+
+    self:SetFuel( -1 )
 end
 
 function PANEL:PerformLayout(w, h)
@@ -42,9 +51,15 @@ function PANEL:PerformLayout(w, h)
 end
 
 function PANEL:SetCooldown( fraction )
-    --level = 1 - level
-    --self:SetAlpha( level * level * 255 )
     self.icon.fraction = fraction
+end
+
+function PANEL:SetFuel( fraction )
+    self.icon.fuel = fraction
+end
+
+function PANEL:GetFuel( fraction )
+    return self.icon.fuel
 end
 
 function PANEL:Flash( level )
@@ -56,6 +71,7 @@ end
 
 function PANEL:SetMaterial( mat )
     self.icon:SetMaterial( mat )
+    self:SetFuel( -1 )
 end
 
 function PANEL:GetMaterial()

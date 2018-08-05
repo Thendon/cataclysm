@@ -14,7 +14,7 @@ player.skills[KEY_Q] = "earth_bust"
 player.skills[KEY_E] = "earth_wall"
 player.skills[KEY_LSHIFT] = "earth_boost"
 player.skills[MOUSE_LEFT] = "earth_blast"
-player.skills[MOUSE_RIGHT] = "fire_ball" --"earth_push"
+player.skills[MOUSE_RIGHT] = "earth_push"
 
 if SERVER then
     resource.AddWorkshop( 176540879 ) --guards

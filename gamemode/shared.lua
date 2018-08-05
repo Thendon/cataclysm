@@ -37,5 +37,9 @@ end
 function GM:Think()
     CalcDelta()
     if SERVER then round_manager.Update() end
-    if CLIENT then music_manager.Update() end
+    if CLIENT then
+        music_manager.Update()
+        Popup.Update()
+        KillLog.Update()
+    end
 end

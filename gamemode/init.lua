@@ -81,6 +81,14 @@ end
 
 function GM:DeathMessage( victim, inflictor, attacker )
     inflictor = inflictor:IsWorld() and "world" or inflictor:GetName()
+
+    if ( !IsValid(attacker) or !attacker:IsPlayer() or attacker == victim ) then
+        attacker = victim:AssumeAttacker()
+    end
+
+    if attacker == game.GetWorld() then
+        inflictor = "world"
+    end
     --todo send team colors and attacker name instead
     netstream.Start(player.GetAll(), "DeathMessage", victim, attacker, inflictor)
 end
@@ -97,12 +105,19 @@ function GM:DoPlayerDeath(ply, attacker, dmgInfo)
 
     ply:AddDeaths( 1 )
 
-    if ( !attacker:IsValid() or !attacker:IsPlayer() ) then return end
-    if ( attacker == ply ) then return end
+    print(attacker)
 
-    attacker:AddScore( 10 )
+    if ( !IsValid(attacker) or !attacker:IsPlayer() or attacker == ply ) then
+        attacker = ply:AssumeAttacker()
+    end
+
+    if attacker:IsPlayer() and attacker:Team() != ply:Team() then
+        attacker:AddScore( 10 )
+    end
+
     for k, assist in next, ply:GetAssists() do
         if assist.player == attacker then continue end
+        if attacker:Team() == ply:Team() then continue end
         assist.player:AddScore( 5 )
     end
 end
@@ -115,6 +130,7 @@ function GM:ShouldCollide(ent1, ent2)
 end
 
 function GM:EntityTakeDamage( ent, dmg )
+    print(ent,dmg)
     --TODO remove physics damage to player
     if (dmg:GetAttacker().isskill) then return true end
 end

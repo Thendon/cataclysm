@@ -38,7 +38,8 @@ function SpawnCreator.AddSpawn()
     local pos = LocalPlayer():GetPos() + Vector(0,0,20)
     local ang = LocalPlayer():GetAngles()
 
-    if (SpawnCreator.spawns[1]) then
+    if (SpawnCreator.spawns[1].pos) then
+        PrintTable(SpawnCreator.spawns[1])
         local distance = (SpawnCreator.spawns[1].pos - pos):LengthSqr()
         if distance > maxDistance then
             print("SPAWN TO FAR AWAY FROM ORIGIN")

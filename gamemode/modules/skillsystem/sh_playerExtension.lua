@@ -40,6 +40,10 @@ if CLIENT then
     function meta:SetCasting( skill, status )
         self.casting = self.casting or {}
         self.casting[skill] = status
+
+        if skill:GetCastUntilRelease() then
+            self:SetFuelDirection( skill, status and -1 or skill:GetRefillFactor() )
+        end
     end
 
     netstream.Hook("player:SkillDenied", function( skillname )
@@ -64,9 +68,7 @@ end
 
 if SERVER then
     function meta:UseSkill( skill, cleverData )
-        print(self,skill,cleverData)
-
-        if !self:CanActivateSkill( skill ) then --todo add skill conditions
+        if !self:CanActivateSkill( skill ) or !skill:CanBeActivated( self ) then --todo add skill conditions
             netstream.Start(self, "player:SkillDenied", skill:GetName())
             return
         end
@@ -103,6 +105,10 @@ if SERVER then
         self.castingEnts = self.castingEnts or {}
 
         self.casting[skill] = status
+        if skill:GetCastUntilRelease() then
+            self:SetFuelDirection( skill, status and -1 or skill:GetRefillFactor() )
+        end
+
         if status then
             if IsValid(self.castingEnts[skill]) then
                 skill:Deactivate(self.castingEnts[skill])
@@ -111,6 +117,7 @@ if SERVER then
         else
             skill:Deactivate(self.castingEnts[skill])
         end
+
         netstream.Start(self, "player:SetCasting", skill:GetName(), status)
     end
 
@@ -181,4 +188,32 @@ function meta:ApplyGlobalCooldown( timestamp, epsilon )
         self.nextUse[otherSkill] = global - epsilon
         self.cooldownTime[otherSkill] = globalCooldown - epsilon
     end
+end
+
+function meta:SetFuelDirection( skill, direction )
+    self:UpdateFuel( skill )
+    self.fuelDirection = self.fuelDirection or {}
+    self.fuelDirection[skill] = direction
+end
+
+function meta:GetFuelDirection( skill )
+    self.fuelDirection = self.fuelDirection or {}
+    return self.fuelDirection[skill] or 1
+end
+
+function meta:UpdateFuel( skill )
+    self.skillFuel = self.skillFuel or {}
+    self.lastFuelUpdate = self.lastFuelUpdate or {}
+    self.skillFuel[skill] = self.skillFuel[skill] or skill:GetMaxLive()
+    self.lastFuelUpdate[skill] = self.lastFuelUpdate[skill] or CurTime()
+
+    local change = (CurTime() - self.lastFuelUpdate[skill]) * self:GetFuelDirection(skill)
+    self.skillFuel[skill] = math.Clamp(self.skillFuel[skill] + change, 0, skill:GetMaxLive())
+
+    self.lastFuelUpdate[skill] = CurTime()
+end
+
+function meta:GetFuel( skill )
+    self:UpdateFuel( skill )
+    return self.skillFuel[skill]
 end

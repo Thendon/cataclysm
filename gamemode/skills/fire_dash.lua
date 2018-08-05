@@ -1,7 +1,7 @@
 local skill = Skill( "fire_dash")
 skill:SetDescription("Dash forward. You can't stop once started though!")
 skill:SetMaxLive( 1 )
-skill:SetCooldown( 1 )
+skill:SetCooldown( 5 )
 
 local power = 1750
 

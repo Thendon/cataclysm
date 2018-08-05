@@ -228,10 +228,13 @@ if SERVER then
         netstream.Start(player.GetAll(), "round_manager:InitState", state, round_manager.GetStateTimestamp())
     end
 
+    --These have spawns
     local maps = {
         "gm_uldum2",
         "gm_floatingworlds_3",
-        "001_nanshansi_shishi"
+        "gm_isles",
+        "gm_dunes",
+        --"001_nanshansi_shishi" --CSS CONTENT
     }
 
     function round_manager.LoadNextMap()
@@ -329,6 +332,10 @@ if CLIENT then
         round_manager.SetStateTime( timestamp )
         local sound = states[round_manager.roundState].sound
         if sound then PlayBGS("element/fx/misc/" .. sound) end
+
+        if state == ROUND_STATE.ACTIVE then
+            Popup.Add("Fight!", _COLOR.RED)
+        end
     end
 
     function round_manager.SetStartTime( timestamp )
@@ -341,20 +348,19 @@ if CLIENT then
 
     function round_manager.TeamScored(winner, points)
         if !winner then
-            print("DRAW")
+            Popup.Add("Round Draw!")
             return
         end
-        print("WINNER", winner)
+        Popup.Add("Team " .. team.GetName(winner) .. " Scores!", team.GetColor(winner))
         team.SetScore(winner, points)
-        --todo announce winner
     end
 
     function round_manager.AnnounceWinner(winner)
         if !winner then
-            print("DRAW")
+            Popup.Add("Match Draw!")
             return
         end
-        print("WINNER", winner)
+        Popup.Add("Team " .. team.GetName(winner) .. " won!", team.GetColor(winner))
     end
 
     netstream.Hook("round_manager:SetInfos", function(state, stateTime, startTime, round, scores)

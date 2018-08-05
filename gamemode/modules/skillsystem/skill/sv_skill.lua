@@ -18,7 +18,11 @@ function Skill:CreateEntity( caster, cleverData )
     local skillEnt = ents.Create("element_skill")
     skillEnt:SetSkill( self )
     skillEnt:SetCaster( caster )
-    skillEnt:SetMaxLive( self.maxlive )
+    if self:GetCastUntilRelease() then
+        skillEnt:SetMaxLive( caster:GetFuel( self ) )
+    else
+        skillEnt:SetMaxLive( self.maxlive )
+    end
     skillEnt:SetName(self.name)
     self:Spawn( skillEnt, caster, cleverData )
     skillEnt:Spawn()

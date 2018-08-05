@@ -1,10 +1,10 @@
 local player = FindMetaTable( "Player" )
 
 local speedEpsilon = 500
-local stopEpsilon = 700
+local stopEpsilon = 600
 local speedDamageFactor = 0.05
 local waitAfterPhysHit = 0.05
-local assumeHitAttacker = 7
+local assumeHitAttacker = 10
 local maxFallDmg = 45
 
 local fallsounds_hard = {
@@ -82,6 +82,14 @@ function player:FinishMove(mv)
     self:HitWorld( speed )
 end
 
+function player:AssumeAttacker()
+    local lastHit = self:LastHit()
+    if (!lastHit) then return game.GetWorld() end
+    if (lastHit.time < self:LastDeath()) then return game.GetWorld() end
+    if (lastHit.time + assumeHitAttacker < CurTime()) then return game.GetWorld() end
+    return lastHit.attacker
+end
+
 function player:HitWorld( speed )
     if !self:Alive() then return end
 
@@ -95,12 +103,7 @@ function player:HitWorld( speed )
     dmg:SetDamageType(DMG_GENERIC) --DMG_FALL
     dmg:SetInflictor(game.GetWorld())
 
-    local lastHit = self:LastHit()
-    if (lastHit and lastHit.time > self:LastDeath() and lastHit.time + assumeHitAttacker > CurTime()) then
-        dmg:SetAttacker(lastHit.attacker)
-    else
-        dmg:SetAttacker(game.GetWorld())
-    end
+    dmg:SetAttacker(self:AssumeAttacker())
     dmg:SetDamage(damage)
 
     self:TakeDamageInfo(dmg)
