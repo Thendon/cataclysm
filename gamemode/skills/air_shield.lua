@@ -3,7 +3,7 @@ local immune = 5
 local rate = 0.5
 
 local stage2 = immune - 2
-skill:SetDescription("Become completely immune to damage and move everything out of your way")
+skill:SetDescription("Become completely immune to damage and move everything out of your way.")
 skill:SetMaxLive( immune )
 skill:SetCooldown( 10 )
 skill:SetStages( { stage2 } )
