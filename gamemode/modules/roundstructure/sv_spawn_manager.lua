@@ -7,13 +7,7 @@ spawn_manager.usedSpawnPoints = spawn_manager.usedSpawnPoints or {}
 
 spawn_manager.domes = spawn_manager.domes or {}
 
-function spawn_manager.LoadSpawnFile()
-    local filename = "element/" .. game.GetMap() .. ".txt"
-    local content = file.Read( filename, "DATA" )
-    if !content then return end
-    local spawns = util.JSONToTable(content)
-    if !spawns or table.Count(spawns) == 0 then return end
-
+local function loadSpawns(spawns)
     local i = 1
     for _, group in next, spawns do
         spawn_manager.spawnPoints[i] = {}
@@ -22,6 +16,29 @@ function spawn_manager.LoadSpawnFile()
         end
         i = i + 1
     end
+end
+
+function spawn_manager.LoadSpawnFile()
+    local filename = "element/" .. game.GetMap() .. ".txt"
+    local content = file.Read( filename, "DATA" )
+    if !content then return end
+    local spawns = util.JSONToTable(content)
+    if !spawns or table.Count(spawns) == 0 then return end
+
+    loadSpawns(spawns)
+end
+
+function spawn_manager.BackupSpawns()
+    local filename = "element/" .. game.GetMap()
+    local content = file.Read( filename .. ".txt", "DATA" )
+    if !content then return end
+    file.Write(filename .. "_" .. os.time() .. ".txt", content)
+end
+
+function spawn_manager.SaveSpawns( spawns )
+    local filename = "element/" .. game.GetMap() .. ".txt"
+    spawn_manager.BackupSpawns()
+    file.Write(filename, spawns)
 end
 
 function spawn_manager.SwapSpawnPoints()
@@ -160,5 +177,16 @@ function spawn_manager.KeepEverythingInDome()
 end
 
 netstream.Hook("spawn_manager:RequestSpawns", function( ply )
+    if !ply:IsAdmin() and !ply:IsSuperAdmin() then return end
+
     netstream.Start(ply, "SpawnCreator:LoadSpawns", spawn_manager.spawnPoints)
+end)
+
+netstream.Hook("spawn_manager:SaveSpawns", function( ply, spawnTable )
+    if !ply:IsAdmin() and !ply:IsSuperAdmin() then return end
+
+    local spawns = util.TableToJSON(spawnTable)
+    spawn_manager.SaveSpawns(spawns)
+
+    loadSpawns(spawnTable)
 end)

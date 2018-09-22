@@ -8,7 +8,7 @@ local fileBlacklist = {
     "db", "vvd", "phy", "vtf", "vtx", "txt", "ztmp"
 }
 
-local function processFolder( path, domain, handle, foldername )
+local function ProcessFolder( path, domain, handle, foldername )
     local files, folders = file.Find( path .. "/*", domain )
     path = path .. "/"
     for _, filename in next, files do
@@ -16,9 +16,11 @@ local function processFolder( path, domain, handle, foldername )
     end
 
     for _, folder in next, folders do
-        processFolder( path .. folder, domain, handle, folder )
+        ProcessFolder( path .. folder, domain, handle, folder )
     end
 end
+
+_G.ProcessFolder = ProcessFolder
 
 local function removeGamemodePrefix( path )
     if ( string.find(path, GM.Name .. "/gamemode/") ) then
@@ -29,7 +31,7 @@ end
 
 local function AddCSFolder( path )
     local count = 0
-    processFolder( path, "LUA", function( foldername, filename )
+    ProcessFolder( path, "LUA", function( foldername, filename )
         if ( string.StartWith( filename, "sv_") or filename == "init.lua" ) then return end
 
         AddCSLuaFile( removeGamemodePrefix(foldername) .. filename )
@@ -40,7 +42,7 @@ local function AddCSFolder( path )
 end
 
 local function AddResources( path )
-    processFolder( path, "GAME", function( foldername, filename)
+    ProcessFolder( path, "GAME", function( foldername, filename)
         local ext = string.GetExtensionFromFilename( filename )
         if ( table.HasValue(fileBlacklist, ext) ) then return end
 
@@ -58,7 +60,7 @@ end
 
 local function LoadFolder( path )
     local count = 0
-    processFolder( path, "LUA", function( foldername, filename )
+    ProcessFolder( path, "LUA", function( foldername, filename )
         if ( !checkPrefix( filename ) ) then return end
 
         include( removeGamemodePrefix(foldername) .. filename )
@@ -74,7 +76,7 @@ local function LoadManagedMusic()
     local countTracks = 0
     local tracks = {}
 
-    processFolder( "sound/element/music_managed", "THIRDPARTY", function( path, filename, foldername )
+    ProcessFolder( "sound/element/music_managed", "THIRDPARTY", function( path, filename, foldername )
         countFiles = countFiles + 1
         if (!tracks[foldername]) then
             tracks[foldername] = {}
@@ -103,6 +105,7 @@ if SERVER then
     AddResources( "resource/fonts")
 end
 print("# Loading Code")
+LoadFolder( GM.Name .. "/gamemode/config" )
 LoadFolder( GM.Name .. "/gamemode/resources" )
 LoadFolder( GM.Name .. "/gamemode/managers" )
 LoadFolder( GM.Name .. "/gamemode/extensions" )

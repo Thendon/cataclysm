@@ -1,16 +1,25 @@
 _G.round_manager = round_manager or {}
 
-local wins = 5
-local warmupTime = 3 * 60
-local prepTime = 1 * 30
-local roundTime = 5 * 60
-local overTime = 1 * 30
---[[
-warmupTime = 3
---prepTime = 1
-roundTime = 10
-overTime = 1
-]]
+local wins = CataSettings.wins
+local warmupTime = CataSettings.warmupTime
+local prepTime = CataSettings.prepTime
+local roundTime = CataSettings.roundTime
+local overTime = CataSettings.overTime
+local gameoverTime = CataSettings.gameoverTime
+local mapvoteCommand = CataSettings.mapvoteCommand
+local rotateTxtFiles = CataSettings.rotateTxtFiles
+local maps = CataSettings.rotateMapsOverride
+
+if SERVER and rotateTxtFiles then
+    print(" - Overriding map rotation:")
+    table.Empty(maps)
+    ProcessFolder( "element", "DATA", function( foldername, filename )
+        local mapname = string.sub(filename, 0, string.len(filename) - 4)
+        print("  * " .. mapname)
+        table.insert(maps, mapname)
+    end)
+end
+
 _G.ROUND_STATE = {}
 ROUND_STATE.UNKNOWN = -1
 ROUND_STATE.LOADING = 0
@@ -30,7 +39,7 @@ states[ROUND_STATE.WARMUP] = { name = "Warmup", time = warmupTime }
 states[ROUND_STATE.PREPARING] = { name = "Preparing", time = prepTime, sound = "flute9.wav" }
 states[ROUND_STATE.ACTIVE] = { name = "Active", time = roundTime, sound = "flute1.wav" }
 states[ROUND_STATE.OVER] = { name = "Over", time = overTime, sound = "flute6.wav" }
-states[ROUND_STATE.GAMEOVER] = { name = "Game Over", time = overTime, sound = "flute8.wav" }
+states[ROUND_STATE.GAMEOVER] = { name = "Game Over", time = gameoverTime, sound = "flute8.wav" }
 
 local defRoundState = SERVER and ROUND_STATE.LOADING or ROUND_STATE.UNKNOWN
 round_manager.roundState = round_manager.roundState or defRoundState
@@ -205,7 +214,6 @@ if SERVER then
         round_manager.SetRoundState( state )
 
         if state == ROUND_STATE.WARMUP then
-            --round_manager.ResetSpawnPoints()
             spawn_manager.LoadSpawnFile()
         elseif state == ROUND_STATE.PREPARING then
             spawn_manager.SwapSpawnPoints()
@@ -223,19 +231,11 @@ if SERVER then
             round_manager.ScoreWinner()
         elseif state == ROUND_STATE.GAMEOVER then
             round_manager.AnnounceWinner()
+            if mapvoteCommand != "" then RunConsoleCommand(mapvoteCommand) end
         end
 
         netstream.Start(player.GetAll(), "round_manager:InitState", state, round_manager.GetStateTimestamp())
     end
-
-    --These have spawns
-    local maps = {
-        "gm_uldum2",
-        "gm_floatingworlds_3",
-        "gm_isles",
-        "gm_dunes",
-        --"001_nanshansi_shishi" --CSS CONTENT
-    }
 
     function round_manager.LoadNextMap()
         local index = 1
