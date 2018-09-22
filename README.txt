@@ -17,4 +17,4 @@ Shoutout to:
 rusty - https://steamcommunity.com/id/years/
 
 Trailer:
-[![Trailer](http://img.youtube.com/vi/CO3GU6ff-j4/0.jpg)](http://www.youtube.com/watch?v=CO3GU6ff-j4)
+http://www.youtube.com/watch?v=CO3GU6ff-j4
