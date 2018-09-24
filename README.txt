@@ -15,3 +15,6 @@ Threebow - https://github.com/Threebow/tdlib
 
 Shoutout to:
 rusty - https://steamcommunity.com/id/years/
+
+Trailer:
+http://www.youtube.com/watch?v=CO3GU6ff-j4
