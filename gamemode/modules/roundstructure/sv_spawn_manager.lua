@@ -29,10 +29,10 @@ function spawn_manager.LoadSpawnFile()
 end
 
 function spawn_manager.BackupSpawns()
-    local filename = "element/" .. game.GetMap()
-    local content = file.Read( filename .. ".txt", "DATA" )
+    local mapname = game.GetMap()
+    local content = file.Read( "element/" .. mapname .. ".txt", "DATA" )
     if !content then return end
-    file.Write(filename .. "_" .. os.time() .. ".txt", content)
+    file.Write("element_backups/" .. mapname .. "_" .. os.time() .. ".txt", content)
 end
 
 function spawn_manager.SaveSpawns( spawns )

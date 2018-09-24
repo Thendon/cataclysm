@@ -103,6 +103,9 @@ if SERVER then
     AddCSFolder( GM.Name .. "/gamemode" )
     AddCSFolder( GM.Name .. "/entities" )
     AddResources( "resource/fonts")
+
+    if !file.Exists("element", "DATA") then file.CreateDir("element", "DATA") end
+    if !file.Exists("element_backups", "DATA") then file.CreateDir("element_backups", "DATA") end
 end
 print("# Loading Code")
 LoadFolder( GM.Name .. "/gamemode/config" )

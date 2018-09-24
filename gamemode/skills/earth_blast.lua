@@ -3,7 +3,7 @@ local forward_offset = 60
 local skill = Skill( "earth_blast" )
 skill:SetDescription("Throw a giant rock at your opponent.")
 local damage_min_speed = 50
-local damage_on_hit = 30
+local damage_on_hit = 40
 damage_min_speed = damage_min_speed * damage_min_speed
 damage_factor = 1 / damage_on_hit
 skill:SetStages({ end_up })
