@@ -100,6 +100,7 @@ if SERVER then
     print("# Setup FastDL")
     AddCSFolder( GM.Name .. "/gamemode" )
     AddCSFolder( GM.Name .. "/entities" )
+    --TODO: add fonts to content!
     AddResources( "resource/fonts")
 end
 print("# Loading Code")

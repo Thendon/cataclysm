@@ -1,10 +1,10 @@
 
 surface.CreateFont( "fujimaru", {
-    font = "Fujimaru",
+    font = "edo",
     size = 64,
 })
 
 surface.CreateFont( "fujimaru_small", {
-    font = "Fujimaru",
+    font = "edo",
     size = 40,
 })
