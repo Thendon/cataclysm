@@ -17,6 +17,7 @@ AccessorFunc( Skill, "cleverFriendly", "CleverFriendly", FORCE_BOOL )
 AccessorFunc( Skill, "cleverTarget", "CleverTarget", FORCE_NUMBER )
 AccessorFunc( Skill, "castOnRelease", "CastOnRelease", FORCE_BOOL )
 AccessorFunc( Skill, "castUntilRelease", "CastUntilRelease", FORCE_BOOL )
+AccessorFunc( Skill, "refillFactor", "RefillFactor", FORCE_NUMBER )
 AccessorFunc( Skill, "name", "Name", FORCE_STRING )
 AccessorFunc( Skill, "damageType", "DamageType", FORCE_STRING )
 AccessorFunc( Skill, "stages", "Stages" )
@@ -36,17 +37,20 @@ function Skill:_init( name )
     self.cleverFriendly = false
     self.castOnRelease = false
     self.castUntilRelease = false
+    self.refillFactor = 1
     self.icon = Material("element/skills/" .. name .. ".png", "noclamp")
 end
 
 function Skill:CanBeActivated( caster, pressing, cleverData )
-    if !self:ActivationConditions( caster, pressing, cleverData ) then return false end
+    if !self:ActivationConditions( caster ) then return false end
+    if SERVER then return true end
+
     if self:GetCastUntilRelease() then return caster:GetCasting( self ) != pressing end
     if self:GetCastOnRelease() then return !pressing end
     return pressing
 end
 
-function Skill:ActivationConditions( caster, pressing, cleverData )
+function Skill:ActivationConditions( caster )
     return true
 end
 
@@ -58,4 +62,8 @@ end
 function Skill:SetRange( range )
     self:SetRangeSqr( range * range )
     self.range = range
+end
+
+function Skill:Update( ent, stage )
+    ecall(self["Stage" .. stage], self, ent )
 end

@@ -4,7 +4,7 @@ skill:SetDescription("Protect you and your allies with a mobile shield of water.
 local uptime = 6
 
 skill:SetMaxLive( uptime )
-skill:SetCooldown( 0.5 )
+skill:SetCooldown( 10 )
 skill:SetStages( {uptime - 1} )
 
 local size = 1.5
@@ -34,6 +34,7 @@ end
 function skill:Transition1( ent )
     if SERVER then return end
     --ent.bgl:FadeOut(1)
+    ent:StopSound("water_stream2")
 end
 
 function skill:Stage2( ent )
@@ -42,7 +43,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
+        caster:PlayAnimation("summon_water")
 
         local forward = caster:GetForward()
         forward.z = 0
@@ -50,7 +51,8 @@ if CLIENT then
         local ang = forward:Angle()
         ang:RotateAroundAxis(ang:Up(), -90)
 
-        PlayBGL( ent, "water_stream2", 1 )
+        --PlayBGL( ent, "water_stream2", 1 )
+        ent:EmitSound("water_stream2")
 
         local child = ent:GetNW2Entity("particleChild")
         if !IsValid(ent) then print("not valid") return end

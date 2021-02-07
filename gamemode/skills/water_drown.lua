@@ -61,14 +61,13 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
+        caster:PlayAnimation("summon_water2")
         ent:CreateParticleEffect("element_water_drown", 1)
         ent:EmitSound("water_waves")
     end
 
     function skill:OnRemove( ent )
         ent:StopSound("water_waves")
-        --ent:StopAndDestroyParticles()
     end
 end
 

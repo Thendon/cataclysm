@@ -10,7 +10,6 @@ function GM:UpdateAnimation( ply )
 end
 
 function GM:FinishedLoading()
-    print("finished loading")
     netstream.Start("GM:FinishedLoading")
     skill_manager.Initialize()
 
@@ -44,39 +43,6 @@ function GM:GetEnemyTeamColor( player )
     local teamID = self:GetEnemyTeam( player )
     return self:GetTeamNumColor( teamID )
 end
-
-netstream.Hook("DeathMessage", function( victim, attacker, inflictor )
-    if !IsValid(victim) or victim:IsSpectator() then return end
-
-    local teamColor = GAMEMODE:GetEnemyTeamColor(victim)
-
-    local text = {}
-    table.insert(text, player_manager.RunClass(victim, "GetClassColor"))
-    table.insert(text, victim:GetName())
-    table.insert(text, teamColor)
-    table.insert(text, " killed ")
-
-    if (attacker == victim) then
-        table.insert(text, "himself")
-        chat.AddText(unpack(text))
-        return
-    end
-
-    if (inflictor and !IsValid(attacker) or attacker.GetName and inflictor != attacker:GetName()) then
-        table.insert(text, "from ")
-        table.insert(text, _COLOR.RED) --TODO SHOW SKILL ICON INSTEAD
-        table.insert(text, inflictor)
-        table.insert(text, teamColor)
-    end
-
-    if (IsValid(attacker) and attacker:IsPlayer()) then
-        table.insert(text, " by ")
-        table.insert(text, player_manager.RunClass(attacker, "GetClassColor"))
-        table.insert(text, attacker:GetName())
-    end
-
-    chat.AddText(unpack(text))
-end)
 
 local function GetEyeBounds()
     local eyeAng = EyeAngles()
@@ -148,9 +114,13 @@ function GM:CalcView( ply, origin, angles, fov, znear, zfar )
     lastCamPos = lastCamPos or camPos
     lastCamAng = lastCamAng or angles
 
-    local delta = math.Clamp(FrameTime() * 20, 0, 1)
-    camPos = LerpVector(delta, lastCamPos, camPos)
-    camAng = LerpAngle(delta, lastCamAng, camAng)
+    local speed = 0.4
+    camPos.x = math.Approach(lastCamPos.x, camPos.x, math.abs(camPos.x - lastCamPos.x) * speed)
+    camPos.y = math.Approach(lastCamPos.y, camPos.y, math.abs(camPos.y - lastCamPos.y) * speed)
+    camPos.z = math.Approach(lastCamPos.z, camPos.z, math.abs(camPos.z - lastCamPos.z) * speed)
+
+    camAng.p = math.ApproachAngle(lastCamAng.p, camAng.p, math.abs(lastCamAng.p - camAng.p) * speed)
+    camAng.y = math.ApproachAngle(lastCamAng.y, camAng.y, math.abs(lastCamAng.y - camAng.y) * speed)
 
     lastCamPos = camPos
     lastCamAng = camAng

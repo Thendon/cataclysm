@@ -1,7 +1,7 @@
 local skill = Skill( "fire_dragon")
 skill:SetDescription("Blow a constant fire stream on your enemies.")
 skill:SetMaxLive( 2 )
-skill:SetCooldown( 1 )
+skill:SetCooldown( 8 )
 
 local damage = 10
 local rate = 0.1

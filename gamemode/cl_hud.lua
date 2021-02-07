@@ -31,8 +31,8 @@ local function DrawPlayerInfos(x,y,w,h, ply, color, distance)
     local width = math.floor(w * (1 - CalcHealthFactor(ply)))
     surface.SetDrawColor( health )
     surface.DrawRect(x + w - width,y, width,h)
-    surface.SetDrawColor( health )
-    surface.DrawRect(x - 2, y - h * 0.2, 2, h + h * 0.4)
+    --[[surface.SetDrawColor( health )
+    surface.DrawRect(x - 2, y - h * 0.2, 2, h + h * 0.4)]]
 end
 
 function GM:DrawPlayerHealthbar(ply, distance)
@@ -41,6 +41,12 @@ function GM:DrawPlayerHealthbar(ply, distance)
     local teamColor = team.GetColor(ply:Team())
 
     DrawPlayerInfos(x,y,w,h, ply, teamColor, distance)
+
+    local name = ply:GetName()
+    surface.SetFont("HudSelectionText")
+    surface.SetTextColor( teamColor )
+    surface.SetTextPos(x - string.len(name) * 1, y - h * 4)
+    surface.DrawText(name)
 end
 
 function GM:PaintHealthbar()
@@ -57,12 +63,9 @@ function GM:PaintHealthbar()
 end
 
 function GM:DrawPlayerClass(ply)
-    local icon = ply:GetClassIcon(ply)
-    if !icon then return end
-
     surface.SetDrawColor( _COLOR.WHITE )
-    surface.SetMaterial(icon)
-    surface.DrawTexturedRect(-38, -10, 16,16)
+    surface.SetMaterial(player_manager.RunClass(ply, "GetClassIcon"))
+    surface.DrawTexturedRect(-38, -11, 16,16)
 end
 
 local teams = {} --TODO move this into vgui

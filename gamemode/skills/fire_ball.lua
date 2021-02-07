@@ -4,13 +4,13 @@ skill:SetDescription("Throw a fireball, which explodes on impact.")
 skill:SetStages({ end_up })
 skill:SetCastTime( 0.5 )
 skill:SetMaxLive( 10 )
-skill:SetCooldown( 1 ) --10 )
+skill:SetCooldown( 10 )
 skill:SetDamageType( "fire" )
 
 local moveSpeed = 5000
 local blastRange = 1000
 local blastDamage = 50
-local blastPower = 10
+local blastPower = 15
 
 blastRange = blastRange * blastRange
 
@@ -31,7 +31,7 @@ end
 
 function skill:Transition1( ent )
     if CLIENT then
-        ent:EmitSound( "fire_burning" )
+        ent:EmitSound( "fire_engine" )
         return
     end
     ent:InitPhys(ELEMENT_PHYS_TYPE.PROJECTILE)
@@ -53,7 +53,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        --sound.Play("fire_explode", ent:GetPos())
+        sound.Play("fire_ignite", ent:GetPos())
 
         caster:PlayAnimation("shoot_fire1")
         sound.Play(sounds[math.random(1, 2)], caster:GetPos())
@@ -80,8 +80,8 @@ end
 
 function skill:OnRemove( ent )
     if CLIENT then
-        ParticleEffect("element_fire_explode"--[[explosions[math.random(1, 3)]], ent:GetPos(), Angle())
-        ent:StopSound("fire_burning")
+        ParticleEffect("element_fire_explode", ent:GetPos(), Angle())
+        ent:StopSound("fire_engine")
         sound.Play("fire_explode", ent:GetPos())
         return
     end
@@ -96,8 +96,9 @@ function skill:OnRemove( ent )
         print(hit.obj, damage, hit.obj:GetMaxHealth())
         local velocity = hit.obj:GetPos() - pos
         velocity.z = velocity.z + 100
+
         hit.obj:SetVelocity(velocity:GetNormalized() * blastPower * damage)
-        self:Hit(ent, hit.obj, damage, DMG_FALL, velocity)
+        self:Hit(ent, hit.obj, damage, DMG_GENERIC, velocity)
     end
 end
 

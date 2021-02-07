@@ -1,6 +1,11 @@
 local path, prefix, name
 local formats = { ".mp3", ".wav" }
 local format = formats[2]
+local LEVELS = {}
+LEVELS.LOUD = 130
+LEVELS.AHHH = 100
+LEVELS.NORM = 80
+LEVELS.SHHH = 60
 
 //EARTH
 path = "element/fx/earth/"
@@ -11,7 +16,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -21,7 +26,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -31,7 +36,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 0.25,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -41,7 +46,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_WEAPON,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -51,7 +56,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_WEAPON,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -61,7 +66,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_WEAPON,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -71,7 +76,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
 	pitch = 100,
 	sound = path .. name .. format
 })
@@ -81,7 +86,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1.0,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 150, 200 },
 	sound = path .. name .. format
 })
@@ -91,7 +96,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1.0,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 150, 200 },
 	sound = path .. name .. format
 })
@@ -105,7 +110,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 80,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -115,7 +120,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 80,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -125,7 +130,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 80,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -135,7 +140,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -145,7 +150,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -155,7 +160,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 0.5,
-	level = 110,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -165,7 +170,27 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1.0,
-	level = 130,
+	level = LEVELS.LOUD,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "engine"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = LEVELS.LOUD,
+	pitch = { 95, 110 },
+	sound = path .. name .. format
+})
+
+name = "ignite"
+sound.Add({
+	name = prefix .. name,
+	channel = CHAN_AUTO,
+	volume = 1.0,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -175,7 +200,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 0.4,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -185,7 +210,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 0.4,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -199,7 +224,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 80,
+	level = LEVELS.LOUD,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -209,7 +234,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -219,7 +244,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -229,7 +254,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -239,7 +264,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 0.25,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -249,7 +274,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 0.25,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -263,7 +288,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -273,7 +298,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -283,7 +308,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -293,7 +318,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -303,7 +328,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -313,7 +338,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -323,7 +348,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -333,7 +358,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -347,7 +372,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -357,7 +382,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -367,7 +392,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -377,7 +402,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -387,7 +412,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -397,7 +422,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -407,7 +432,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -417,7 +442,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -427,7 +452,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -437,7 +462,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -447,7 +472,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_AUTO,
 	volume = 1,
-	level = 100,
+	level = LEVELS.AHHH,
 	pitch = { 95, 110 },
 	sound = path .. name .. format
 })
@@ -457,7 +482,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 60,
+	level = LEVELS.SHHH,
 	pitch = 100,
 	sound = path .. name .. format
 })
@@ -467,7 +492,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 60,
+	level = LEVELS.SHHH,
 	pitch = 100,
 	sound = path .. name .. format
 })
@@ -477,7 +502,7 @@ sound.Add({
 	name = prefix .. name,
 	channel = CHAN_ITEM,
 	volume = 1,
-	level = 60,
+	level = LEVELS.SHHH,
 	pitch = 100,
 	sound = path .. name .. format
 })

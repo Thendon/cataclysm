@@ -2,7 +2,7 @@
 local skill = Skill( "water_shot" )
 skill:SetDescription("Shoot water at your enemies.")
 skill:SetMaxLive( 5 )
-skill:SetCooldown( 1 )
+skill:SetCooldown( 1.5 )
 skill:SetCleverCast( true )
 skill:SetCleverTarget( Skill.TARGET.PLAYERLOCK )
 skill:SetCastOnRelease( false )
@@ -21,7 +21,7 @@ end
 
 if CLIENT then
     function skill:Activate( ent, caster )
-        caster:PlayAnimation("shoot_fire" .. math.random(1,2))
+        caster:PlayAnimation("shoot_water")
 
         local effect = ent:CreateParticleEffect("element_water_attack", 1)
         effect:AddControlPoint( 1, ent:GetTarget(), PATTACH_ABSORIGIN_FOLLOW, 0, _VECTOR.UP * 50 )

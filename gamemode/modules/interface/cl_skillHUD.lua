@@ -1,4 +1,4 @@
-local HUD = HUD or {}
+local HUD = SkillHUD or {}
 
 local keyStrings = {}
 keyStrings[KEY_Q] = "Q"
@@ -24,22 +24,23 @@ function HUD.Init()
     HUD.skillBar = TDLib("DPanel", HUD.derma)
 
     local scrw, scrh = ScrW(), ScrH()
+    local x = 96
     HUD.derma:SetSize(scrw, scrh)
     HUD.derma:ClearPaint()
-    HUD.skillBar:SetPos( 64, scrh - 256 )
+    HUD.skillBar:SetPos( x, scrh - 256 )
     HUD.skillBar:ClearPaint()
 
     local i = 0
-    skillo = skillw + 16
+    skillo = skillw + 32
     HUD.CreateSkill(KEY_Q, skillo * i, 0)
     i = i + 1
     HUD.CreateSkill(KEY_E, skillo * i, 0)
     i = i + 1
     HUD.CreateSkill(KEY_LSHIFT, skillo * i, 0)
     i = 2
-    HUD.CreateSkill(MOUSE_RIGHT, scrw - skillo * i, 0)
+    HUD.CreateSkill(MOUSE_RIGHT, scrw - x - skillo * i, 0)
     i = i + 1
-    HUD.CreateSkill(MOUSE_LEFT, scrw - skillo * i, 0)
+    HUD.CreateSkill(MOUSE_LEFT, scrw - x - skillo * i, 0)
 
     HUD.skillBar:SetSize(scrw, skillh)
 end
@@ -49,18 +50,19 @@ local function UpdateSkill( panel )
         panel:SetAlpha(0)
         return
     end
-
-    local key = panel:GetKey()
-    local icon = skill_manager.GetSkill(LocalPlayer().skills[key]).icon
     panel:SetAlpha(255)]]
 
     local key = panel:GetKey()
-    local icon = skill_manager.GetSkill(LocalPlayer().skills[key]).icon
+    local skill = skill_manager.GetSkill(LocalPlayer().skills[key])
 
-    if (icon != panel:GetMaterial()) then
-        panel:SetMaterial( icon )
+    if (skill.icon != panel:GetMaterial()) then
+        panel:SetMaterial( skill.icon )
     end
-    panel:SetCooldown( LocalPlayer():GetCooldown( key ) )
+
+    if skill:GetCastUntilRelease() then
+        panel:SetFuel( LocalPlayer():GetFuel( skill ) / skill:GetMaxLive() )
+    end
+    panel:SetCooldown( LocalPlayer():GetCooldown( skill ) )
 end
 
 function HUD.CreateSkill(key, x, y)

@@ -43,7 +43,15 @@ function player:SetRandomClassModel()
     self.Player:SetModel(model)
     if (details) then
         if details.skin then self.Player:SetSkin(details.skin) end
-        if details.body then self.Player:SetBodygroup(details.body.id, details.body.value) end
+        if details.body then
+            if !details.body.id then
+                for k, body in next, details.body do
+                    self.Player:SetBodygroup(body.id, body.value)
+                end
+            else
+                self.Player:SetBodygroup(details.body.id, details.body.value)
+            end
+        end
     end
 end
 

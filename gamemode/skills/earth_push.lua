@@ -75,6 +75,8 @@ if SERVER then
             touched:SetVelocity( ent.pushDir * pushPower * angleFactor )
             --touched:PhysHit(ent.pushDir * pushPower * angleFactor)
             touched:UpdateLastPhysHit()
+
+            self:Hit( ent, touched )
         else
             local phys = touched:GetPhysicsObject()
             phys:AddVelocity( ent.pushDir * pushPower )

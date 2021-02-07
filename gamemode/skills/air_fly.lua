@@ -1,9 +1,10 @@
 
 local skill = Skill( "air_fly" )
 skill:SetDescription("Fly forward and try not to run into something.")
-skill:SetMaxLive( 10 )
+skill:SetMaxLive( 5 )
 skill:SetCooldown( 0.5 )
 skill:SetCastUntilRelease( true )
+skill:SetRefillFactor( 0.2 )
 
 local speed = 1000
 
@@ -41,7 +42,7 @@ if SERVER then
         ent:SetInvisible( true )
         ent:RemoveOnDeath()
         ent:SetPos( caster:GetPos() )
-        caster:SetFallDamper( 10 )
+        caster:SetFallDamper( 10, 0.5 )
     end
 
     function skill:OnRemove( ent )
