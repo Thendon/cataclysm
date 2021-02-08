@@ -7,8 +7,11 @@ AccessorFunc( ENT, "maxlive", "MaxLive", FORCE_INT )
 
 local function StageChange( ent, name, oldval, newval )
     ent.stage = newval
+    
     if (!oldval) then return end
+    if (oldval == newval) then return end
     local skill = ent:GetSkill()
+
     ecall( skill["Transition" .. oldval], skill, ent )
 end
 
@@ -25,8 +28,8 @@ function ENT:SetupDataTables()
     self:NetworkVar("Bool", 0, "Invisible")
     self:NetworkVar("Float", 0, "Birth")
     --faster? has proxys though
-    self:SetNW2Int("stage", 1)
     self:SetNWVarProxy("stage", StageChange)
+    self:SetNWInt("stage", 1)
 
     if SERVER then
         self.touchCooldown = {}

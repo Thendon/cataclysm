@@ -29,9 +29,9 @@ function ENT:Think()
     if ( self:GetRemoveOnWorldTrace() ) then self:CheckWorldTrace() end
     if ( self:GetCustomCollider() ) then self:CalcCustomCollisions() end
 
-    local stage = self:GetNW2Int("stage")
+    local stage = self:GetNWInt("stage")
     if self.skill.stages[stage] and self.alive > self.skill.stages[stage] then
-        self:SetNW2Int("stage", stage + 1)
+        self:SetNWInt("stage", stage + 1)
     end
 
     local skill = self:UpdateSkill( stage )

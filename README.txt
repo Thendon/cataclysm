@@ -18,3 +18,6 @@ rusty - https://steamcommunity.com/id/years/
 
 Trailer:
 http://www.youtube.com/watch?v=CO3GU6ff-j4
+
+Fonts:
+Edo by Vic Fieger - vic@vicfieger.com

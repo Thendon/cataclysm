@@ -17,8 +17,7 @@ function player:Init()
     self.Player:ResetCooldowns( CurTime() )
 
     if CLIENT then
-        print(tostring(self.Player) .. " " .. tostring(self.Player.Team))
-        if self.Player:Team() == LocalPlayer():Team() then
+        if IsValid(LocalPlayer()) and self.Player:Team() == LocalPlayer():Team() then
             sound.Play(self.Sound, self.Player:GetPos())
         end
         self.Player:SetClassIcon( self.Icon )

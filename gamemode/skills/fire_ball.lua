@@ -27,21 +27,30 @@ function skill:Stage1( ent )
     local forward = caster:GetRight():Cross(_VECTOR.UP)
     ent:SetPos( _VECTOR.UP * 50 + caster:GetPos() - forward * 30 )
     ent:SetAngles( forward:Angle() )
+    print("stage1")
 end
 
 function skill:Transition1( ent )
     if CLIENT then
+        print(tostring(ent) .. "emit fire_engine")
         ent:EmitSound( "fire_engine" )
         return
     end
     ent:InitPhys(ELEMENT_PHYS_TYPE.PROJECTILE)
     ent:PhysWake()
+    print("trans1")
+    print(ent)
+    print(ent.velocity)
     ent.velocity = ent:GetCaster():GetAimVector() * moveSpeed
+    print(ent.velocity)
 end
 
 function skill:Stage2( ent )
     if CLIENT then return end
 
+    print("stage2")
+    print(ent)
+    print(ent.velocity)
     --ent:ReachVelocity( ent.velocity )
     local physObj = ent:GetPhysicsObject()
     physObj:SetVelocity(ent.velocity)
@@ -79,8 +88,11 @@ if SERVER then
 end
 
 function skill:OnRemove( ent )
+    print("on remove")
     if CLIENT then
+        print("on remove")
         ParticleEffect("element_fire_explode", ent:GetPos(), Angle())
+        print(tostring(ent) .. "stop fire_engine")
         ent:StopSound("fire_engine")
         sound.Play("fire_explode", ent:GetPos())
         return
